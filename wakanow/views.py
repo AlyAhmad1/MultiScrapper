@@ -1,4 +1,7 @@
 from django.shortcuts import render, redirect
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 from . import login_required
 from selenium import webdriver
 import time
@@ -25,7 +28,8 @@ def form_data(request):
         N=Name.strip()
         R=Reference.strip()
         Details = scraper_form(request,E,N,R)
-        Data = {'Details':Details}
+        Compress_data = json.dumps(Details)
+        Data = {'Details': Details, 'Compress_data': Compress_data}
         return render(request, 'wakanow/Details.html', Data)
     Data = {'Details':''}
     return render(request, 'wakanow/Index.html', Data)
@@ -47,23 +51,60 @@ def scraper_form(request, Email, Name, Reference):
     options.add_argument("--disable-setuid-sandbox")
     options.add_argument("--disable-webgl")
     options.add_argument("--disable-popup-blocking")
+    options.add_experimental_option("excludeSwitches", ["enable-logging"])
     driver = webdriver.Chrome(chrome_options=options)
     # driver = webdriver.Chrome()
     try:
         driver.get("https://www.wakanow.com/en-ng/manage-booking")
-        time.sleep(10)
-        link = driver.find_elements_by_tag_name('div')[14]
-        link.click()
-        input_list = driver.find_elements_by_tag_name('input')
+        try:
+            data = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.TAG_NAME, "main")))
+        except:
+            data = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.TAG_NAME, "main")))
+
+        try:
+            link = driver.find_elements(By.TAG_NAME,'div')[21]
+        except:
+            try:
+                time.sleep(5)
+                link = driver.find_elements(By.TAG_NAME,'div')[21]
+            except:
+                try:
+                    time.sleep(5)
+                    link = driver.find_elements(By.TAG_NAME,'div')[21]
+                except:
+                    try:
+                        time.sleep(5)
+                        link = driver.find_elements(By.TAG_NAME,'div')[21]
+                    except:
+                        messages.error(request, 'ERRORR')
+                        Name = ['Wrong Login Info  Try  Again!!', 0]
+                        return Name
+        try:
+            link.click()
+        except:
+            time.sleep(5)
+            link.click()
+
+        try:
+            FORM = driver.find_element(By.TAG_NAME,'form')
+        except:
+            time.sleep(5)
+            FORM = driver.find_element(By.TAG_NAME,'form')
+
+        input_list = FORM.find_elements(By.TAG_NAME, 'input')
+
         input_list[0].send_keys(Reference)
         input_list[1].send_keys(Name)
         input_list[2].send_keys(Email)
-        submit = driver.find_elements_by_tag_name('button')[6].click()
+        FORM.find_element(By.TAG_NAME,'button').click()
+
     except:
         messages.error(request, 'Wrong Login Information Try  Again!!')
         Name = ['Wrong Login Info  Try  Again!!', 0]
         return Name
-    time.sleep(10)
+
     try:
         Name=data_scraper(request,driver)
         return Name
@@ -74,35 +115,67 @@ def scraper_form(request, Email, Name, Reference):
 
 
 def data_scraper(request, driver):
-    time.sleep(10)
     try:
-        data = driver.find_elements_by_tag_name('i')
+        All_data = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "cards")))
     except:
-        time.sleep(10)
-        data = driver.find_elements_by_tag_name('i')
-    data[8].click()
-    data[9].click()
-    data_tags = driver.find_elements_by_tag_name('div')
-    All_data = data_tags[16].find_elements_by_tag_name('div')
+        All_data = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "cards")))
 
-    N = All_data[3].find_elements_by_tag_name('p')
-    Name = 'Passenger Name\t' + str(N[1].text)
-    Email = 'Email\t'+ str(N[2].text)
-    Contact = 'Contact\t' + str(N[3].text)
+    # All_data = driver.find_element(By.ID,'cards')
 
-    F = All_data[8].find_elements_by_tag_name('p')
-    Location = 'Location\t' + str(F[3].text)
-    Date = 'Date\t' + str(F[1].text)
-    Time = 'Time\t' + str(F[2].text)
-    Flight = 'Flight\t' + str(F[4].text) + str(F[5].text)
-    T_Time = 'Travelling Time\t' + str(F[6].text)
+    try:
+        N = All_data.find_element(By.TAG_NAME,'app-passenger-details').find_elements(By.TAG_NAME, 'p')
+    except:
+        time.sleep(5)
+        N = All_data.find_element(By.TAG_NAME,'app-passenger-details').find_elements(By.TAG_NAME, 'p')
 
-    P = All_data[24].find_elements_by_tag_name('p')
-    Total='Total Amount\t'+str(P[1].text)
-    Paid='Amount Paid\t'+str(P[3].text)
-    Outstanding='Outstanding Amount\t'+str(P[5].text)
+
+    Name = str(N[1].text)
+    Email = str(N[2].text)
+    Contact = str(N[3].text)
+
+    driver.maximize_window()
+    try:
+        WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="confirm-payment"]/div/i')))
+    except:
+        try:
+            WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="confirm-payment"]/div/i')))
+        except Exception as e:
+            raise e
+
+    data = driver.find_elements(By.TAG_NAME,'i')
+    try:
+        data[9].click()
+        data[10].click()
+        data[11].click()
+    except Exception as E:
+        raise E
+
+    F = All_data.find_element(By.TAG_NAME,'app-mbb-flight-details').find_elements(By.TAG_NAME, 'p')
+    Location = str(F[3].text)
+    Date = str(F[1].text)
+    Time = str(F[2].text)
+    Flight = str(F[4].text) + str(F[5].text)
+    T_Time = str(F[6].text)
+
+
+    P = All_data.find_element(By.TAG_NAME,'app-pss-details').find_elements(By.TAG_NAME, 'p')
+    Total= str(P[1].text)
+    Paid= str(P[3].text)
+    Outstanding= str(P[5].text)
     T = P[5].text
-    All = [Name,Email,Contact,Location,Date,Time,Flight,T_Time,Total,Paid,Outstanding, T]
+    T = T[1:]
+
+    Total_Amout_pay = ''
+    for i in T.split(','):
+        Total_Amout_pay += i
+    try:
+        Total_Amout_pay = int(float(Total_Amout_pay))
+    except:
+        Total_Amout_pay = float(Total_Amout_pay)
+
+    All = [Name,Email,Contact,Location,Date,Time,Flight,T_Time,Total,Paid,Outstanding, T, Total_Amout_pay]
     return All
 
 @login_required
@@ -249,3 +322,23 @@ def set_new_password(request, id):
             return render(request, 'wakanow/set_password.html')
     except:
         raise Exception('No OTP Provide')
+
+
+def payment(requests,Amount,ALLData,Temp):
+    # Temp =1 Jumaia/details.html
+    # Temp =0 wakanow/Details.html
+    ALLData = unquote(ALLData).strip('[]').split(',')
+    # Data = []
+
+    # ALLData = str(ALLData).strip("'<>() ").replace('\'', '\"')
+    ALLData = str(ALLData)
+    Data = json.loads(ALLData)
+
+    print('----------------------------')
+    print(Data)
+    print('----------------------------')
+
+    # Main = [Name, Details, Flight,Flight_No, Departure_Time, Arrival_time, Fare_Type,Net_fare, Tax, Total,T]
+    # All = [Name,Email,Contact,Location,Date,Time,Flight,T_Time,Total,Paid,Outstanding, T]
+
+    return render(requests,'wakanow/Payment.html')

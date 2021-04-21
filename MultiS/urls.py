@@ -17,6 +17,7 @@ urlpatterns = [
     path('resetE/', views.reset_password_email, name='reset_email_enter'),
     path('reset/<int:email>', views.reset_password, name='reset_pass'),
     path('setpassword/<int:id>', views.set_new_password, name='set_new_pass'),
+    path('payment/<int:Amount>/<path:ALLData>/<int:Temp>', views.payment, name='payment'),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

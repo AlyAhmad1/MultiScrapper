@@ -9,58 +9,13 @@
 {% endblock %}
 {% block right_panel_5 %}
 {% endblock %}
+{% block Payment %}
+{% endblock %}
+
+
 
 {% load static %}
-<!--<style>-->
-<!--      /* The popup form - hidden by default */-->
-<!--.container1{-->
-<!--  position: fixed;-->
-<!--  width: auto;-->
-<!--  left:400;-->
-<!--  display:block;-->
-<!--  right:auto;-->
-<!--  bottom:20px;-->
-<!--  text-align;left;-->
-<!--  text:bold;-->
-<!--  height:500px;-->
-<!--  border-radius: 15px 50px;-->
-<!--  max-width: 300px;-->
-<!--  padding: 3px;-->
-<!--  background-color: #99d6ff;-->
-<!--  }-->
 
-<!--/* Full-width input fields */-->
-<!--.container1 input[type=text], .container1 input[type=password], .container1 #bank {-->
-<!--  width: 90%;-->
-<!--  padding: 8px;-->
-<!--  margin: 3px 0 15px 0;-->
-<!--  border: none;-->
-<!--  background: #f1f1f1;-->
-<!--  border-radius: 15px;-->
-<!--}-->
-
-<!--/* When the inputs get focus, do something */-->
-<!--.container1 input[type=text]:focus, .container1 input[type=password]:focus, .container1 #bank {-->
-<!--  background-color: #ddd;-->
-<!--  outline: none;-->
-<!--}-->
-
-
-<!--</style>-->
-
-<style>
-    #form {
-    margin-left:0;
-    margin-right:130;
-    width:0%;
-    float:right;
-    display: block;
-    margin-top:0px;
-    border-radius:0px;
-    border:none;
-    box-shadow: none;
-    }
-</style>
 
 
 <div>
@@ -98,84 +53,22 @@
     </table>
 </div>
 
-<form id="form"  method="POST"  action="https://payviacoins.com/api/v1/invoices" class="btcpay-form btcpay-form--block">
-    <input type="hidden" name="storeId" value="Hgd1DVa49BB29CUFFnLoCw33PkYKJPHj2xxjwraf88qM" />
-    <input type="hidden" name="price" value="{{Total}}" />
-    <input type="hidden" name="currency" value="NGN" />
-    <button type="submit" class="submit" name="submit" style="background-color:#0f3b21;" alt="Pay with BtcPay, Self-Hosted Bitcoin Payment Processor">PayViaCoins
-    </button>
-</form>
 
 <div style="margin-bottom:100px;"></div>
 
-
-<!--<div style="Display:None;" class="form-container" id="Payment" >-->
-<!--    <form action="{% url 'managerO' %}" class="container1" method="POST">-->
-<!--        {% csrf_token %}-->
-<!--        <label style="margin-left:0px;" for="receiver">Receiver Email</label>-->
-<!--        <input type="Email" id="receiver" name="Email" placeholder="ABC@gmail.com">-->
-<!--        <label style="margin-left:0px;" for="Amount">Payable Amount</label>-->
-<!--        <input type="text" id="amount" name="amount" value="{{Total}}">-->
-<!--        <label for="name">Customer Name</label>-->
-<!--        <input type="text" id="name" name="Name" placeholder="Enter Your Name">-->
-<!--        <label for="bank">Bank Name</label>-->
-<!--        <select name="bank" id="bank">-->
-<!--            <option value="Bank 1">Bank 1</option>-->
-<!--            <option value="Bank 2">Bank 2</option>-->
-<!--            <option value="Bank 3">Bank 3</option>-->
-<!--            <option value="Bank 1">Bank 4</option>-->
-<!--            <option value="Bank 4">Bank 5</option>-->
-<!--            <option value="Bank 1">Bank 6</option>-->
-<!--        </select>-->
-<!--        <label for="ccnum">Account Number</label>-->
-<!--        <input type="text" id="ccnum" name="account" placeholder="1111-2222-3333-4444">-->
-<!--        <label for="ccnum">CCV</label>-->
-<!--        <input type="text" id="ccv" name="ccv" placeholder="123">-->
-<!--        <label for="bank">WEBSITE</label>-->
-<!--        <select name="website" id="website">-->
-<!--            <option value="Bank 1">ARIKAIR</option>-->
-<!--            <option value="Bank 2">FLYAIRPEACE</option>-->
-<!--            <option value="WAKANOW">WAKANOW</option>-->
-<!--            <option value="OTHERS">OTHERS</option>-->
-<!--        </select>-->
-
-
-
-<!--        <button type="button" onclick="closeForm()" style="width:30%" class="btn btn-danger">Cancel</button>-->
-<!--        <button type="submit" style="align:center;width:30%" class="btn btn-success">Pay</button>-->
-<!--    </form>-->
-<!--</div>-->
-
-
-
-
-
-
-
-<!--<script>-->
-<!--var myVar;-->
-
-<!--function myFunction() {-->
-<!--  myVar = setTimeout(showPage, 3000);-->
-<!--}-->
-
-<!--function showPage() {-->
-<!--  document.getElementById("loader").style.display = "none";-->
-<!--  document.getElementById("myDiv").style.display = "block";-->
-<!--}-->
-
-<!--</script>-->
 <script>
-function openForm() {
-  document.getElementById("Payment").style.display = "block";
-  document.getElementById("B").style.backdrop_filter = "blur(5px)";
+var myVar;
+
+function myFunction() {
+  myVar = setTimeout(showPage, 3000);
 }
 
-function closeForm() {
-  document.getElementById("Payment").style.display = "none";
+function showPage() {
+  document.getElementById("loader").style.display = "none";
+  document.getElementById("myDiv").style.display = "block";
 }
+
 </script>
-
 
 
 

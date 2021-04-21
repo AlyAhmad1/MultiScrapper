@@ -26,7 +26,6 @@ def All_data(request):
     global Total, D, Check
     for i in Check:
         D.append(i)
-    # Items = pickle.dumps(D)
     Items = json.dumps(D)
     Data = {'D': D, 'Total':Total,'Items':Items}
     Check.clear()

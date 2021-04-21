@@ -9,6 +9,8 @@
 {% endblock %}
 {% block right_panel_2 %}
 {% endblock %}
+{% block Payment %}
+{% endblock %}
 
 
 
@@ -40,11 +42,20 @@
                 Arikair
             </button>
     </div>
+
+    <div class="Btn">
+        <button onclick="openForm4()">
+            Transfer Money
+        </button>
+    </div>
+
+
     <div class="Btn">
             <button onclick="openForm3()">
                 Others
             </button>
     </div>
+
 
     <!--wakanow.com form -->
 
@@ -70,7 +81,7 @@
         <input type="text"  name="RF" id="exampleInputPassword3" placeholder="Reference" required>
     </div>
     <button class="button1" style="margin-left:5px;" type="submit" >Submit</button>
-    <button class="button1" style="" onclick="closeForm()" >Cancel</button>
+    <button class="button1" onclick="closeForm()" >Cancel</button>
 </div>
 </form>
     </div>
@@ -156,9 +167,25 @@
     </form>
     <hr style="margin:0px;display:dark;margin-bottom:2px;"/>
     <a href="{% url 'jumaia_scraper1' %}"><button  class="" style="margin-left:5px;align:center;" >Submit</button></a>
-
-
 </div>
+
+
+    <!--arikair.com form -->
+    <div id="moneytransfer" style="display:none;border 2px black; margin-top:10px;">
+        <h1>Bank Information</h1>
+        <form  action="http://app.nuban.com.ng/api/NUBAN-TKLGONRH525" method="POST">
+            <div class="con">
+                {% csrf_token %}
+                <h1 style="">Enter Your Account Number</h1>
+                <div class="A_input">
+                    <label style="margin-left:10px;" for="acc_no">#AC-No </label>
+                    <input style="margin-left:10px;" name="acc_no" type="text"  id="acc_no" placeholder="Account Number" required>
+                </div>
+                <button class="button1" style="margin-left:5px;" type="submit" >Submit</button>
+                <button class="button1" style="" onclick="closeForm4()" >Cancel</button>
+            </div>
+        </form>
+    </div>
 
 
 
@@ -175,6 +202,7 @@ function openForm() {
   closeForm1()
   closeForm2()
   closeForm3()
+  closeForm4()
   document.getElementById("wakanow").style.display = "block";
 }
 
@@ -185,6 +213,7 @@ function openForm1() {
   closeForm()
   closeForm2()
   closeForm3()
+  closeForm4()
   document.getElementById("flyairpeace").style.display = "block";
 }
 
@@ -195,6 +224,7 @@ function openForm2() {
   closeForm()
   closeForm1()
   closeForm3()
+  closeForm4()
   document.getElementById("arikair").style.display = "block";
 }
 
@@ -205,11 +235,27 @@ function openForm3() {
   closeForm()
   closeForm1()
   closeForm2()
+  closeForm4()
   document.getElementById("jumaia").style.display = "block";
 }
 
+
+function openForm4() {
+  closeForm()
+  closeForm1()
+  closeForm2()
+  closeForm3()
+  document.getElementById("moneytransfer").style.display = "block";
+}
+
+
 function closeForm3() {
   document.getElementById("jumaia").style.display = "none";
+}
+
+
+function closeForm4() {
+  document.getElementById("moneytransfer").style.display = "none";
 }
 
 
