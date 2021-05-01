@@ -1,0 +1,199 @@
+{% extends 'wakanow/base.html' %}s
+{% block content %}
+{% block left_panel %}
+{% endblock %}
+{% block left_panel_1 %}
+{% endblock %}
+{% block right_panel_2 %}
+{% endblock %}
+{% block Payment %}
+{% endblock %}
+{% block right_panel %}
+{% endblock %}
+<style>
+    .button1{
+    margin-top:15px;
+    width:70px;
+    height:30px;
+    border-radius:10px;
+    border:2px solid #DC3012;
+    background-color:#DC3012;
+    color:white;
+    box-shadow: 2px 2px 5px black;
+    float:right;}
+</style>
+
+
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<style>
+
+.invoice-title h2, .invoice-title h3 {
+    display: inline-block;
+}
+
+.table > tbody > tr > .no-line {
+    border-top: none;
+}
+
+.table > thead > tr > .no-line {
+    border-bottom: none;
+}
+
+.table > tbody > tr > .thick-line {
+    border-top: 2px solid;
+}
+.container{
+    background: #6610f2;
+    background: -webkit-linear-gradient(59deg, #17a2b8,Black);
+    background: linear-gradient(180deg, #17a2b8,Black);
+    color:white;
+}
+</style>
+
+
+<!------ Include the above in your HEAD tag ---------->
+<div class="container" style="margin-top:60px;">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="invoice-title">
+                <h2>Invoice</h2>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-xs-4">
+                    <address>
+                        <strong>Email:{{data.user_email}}</strong><br>
+                    </address>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-4">
+                    <address>
+                        <strong>Paid on {{data.paid_date}}</strong><br>
+                    </address>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><strong>Order summary</strong></h3>
+                </div>
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table table-condensed">
+                            <thead>
+
+                            <tr>
+                                <td class="text-center"><strong></strong></td>
+                                <td class="text-center"><strong></strong></td>
+                                <td class="text-center"><strong></strong></td>
+                                <td class="text-center"><strong>Passenger Name</strong></td>
+                                <td class="text-center"><strong>Details</strong></td>
+                                <td class="text-center"><strong>flight</strong></td>
+                                <td class="text-center"><strong></strong></td>
+                                <td class="text-center"><strong></strong></td>
+                                <td class="text-center"><strong></strong></td>
+                            </tr>
+
+                            </thead>
+                            <tbody>
+                            <!-- foreach ($order->lineItems as $line) or some such thing here -->
+                            <tr>
+                                <td class="text-center"></td>
+                                <td class="text-center"></td>
+                                <td class="text-center"></td>
+                                <td class="text-center">{{data.passenger}}</td>
+                                <td class="text-center">{{data.details}}</td>
+                                <td class="text-center">{{data.flight}}</td>
+                                <td class="text-center"></td>
+                                <td class="text-center"></td>
+                                <td class="text-center"></td>
+                            </tr>
+
+                            <tr>
+                                <td class="thick-line"></td>
+                                <td class="thick-line"></td>
+                                <td class="thick-line"></td>
+                                <td class="thick-line"></td>
+                                <td class="thick-line text-center"></td>
+                                <td class="thick-line text-center"></td>
+                                <td class="thick-line"></td>
+                                <td class="thick-line"></td>
+                                <td class="thick-line"></td>
+                            </tr>
+
+
+                            <tr>
+                                 <td class="text-center"><strong></strong></td>
+                                 <td class="text-center"><strong></strong></td>
+                                 <td class="text-center"><strong></strong></td>
+                                <td class="text-center"><strong>Account Name</strong></td>
+                                <td class="text-center"><strong>Account Number</strong></td>
+                                <td class="text-center"><strong>Bank Code</strong></td>
+                                <td class="text-center"><strong>Purpose</strong></td>
+                                 <td class="text-center"><strong></strong></td>
+                                 <td class="text-center"><strong></strong></td>
+
+                            </tr>
+
+                            <tr>
+                                <td class="text-center"><strong></strong></td>
+                                <td class="text-center"><strong></strong></td>
+                                <td class="text-center"><strong></strong></td>
+                                <td class="text-center">{{data.account_name}}</td>
+                                <td class="text-center">{{data.account_number}}</td>
+                                <td class="text-center">{{data.bank_code}}</td>
+                                <td class="text-center">{{data.purpose}}</td>
+                                <td class="text-center"><strong></strong></td>
+                                <td class="text-center"><strong></strong></td>
+                            </tr>
+                            <tr>
+                                <td class="thick-line"></td>
+                                <td class="thick-line"></td>
+                                <td class="thick-line"></td>
+                                <td class="thick-line"></td>
+                                <td class="thick-line"></td>
+                                <td class="thick-line"></td>
+                                <td class="thick-line"></td>
+                                <td class="thick-line text-center"><strong>Total Bill</strong></td>
+                                <td class="thick-line text-center">{{data.Total_Bill}}</td>
+                            </tr>
+                            <tr>
+                                <td class="no-line text-center"><strong></strong></td>
+                                <td class="no-line text-center"><strong></strong></td>
+                                <td class="no-line text-center"><strong></strong></td>
+                                <td class="no-line text-center"><strong></strong></td>
+                                <td class="no-line text-center"><strong></strong></td>
+                                <td class="no-line text-center"><strong></strong></td>
+                                <td class="no-line text-center"><strong></strong></td>
+                                <td class="no-line text-center"><strong>Amount Paid</strong></td>
+                                <td class="no-line text-center">{{data.Amount_Paid}}</td>
+                            </tr>
+                            <tr>
+                                <td class="no-line text-center"><strong></strong></td>
+                                <td class="no-line text-center"><strong></strong></td>
+                                <td class="no-line text-center"><strong></strong></td>
+                                <td class="no-line text-center"><strong></strong></td>
+                                <td class="no-line text-center"><strong></strong></td>
+                                <td class="no-line text-center"><strong></strong></td>
+                                <td class="no-line text-center"><strong></strong></td>
+                                <td class="no-line text-center"><strong>Remaining</strong></td>
+                                <td class="no-line text-center">{{data.Bill}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <h6 style="color:black;text-align:center;">Thanks For Choosing Our Services</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

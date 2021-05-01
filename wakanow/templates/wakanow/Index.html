@@ -12,10 +12,21 @@
 {% block Payment %}
 {% endblock %}
 
-
-
 {% load static %}
+<style>
 
+    .form-popup{
+  display:none;
+  position: fixed;
+  width: 100%;
+  left:0px;
+  bottom:250px;
+}
+svg{font-weight:bold;max-width:600px;height:auto;}
+
+</style>
+
+<div id="test">
 <div>
     {% if messages %}
     {% for i in messages %}
@@ -43,11 +54,11 @@
             </button>
     </div>
 
-    <div class="Btn">
-        <button onclick="openForm4()">
-            Transfer Money
-        </button>
-    </div>
+<!--    <div class="Btn">-->
+<!--        <button onclick="openForm4()">-->
+<!--            Transfer Money-->
+<!--        </button>-->
+<!--    </div>-->
 
 
     <div class="Btn">
@@ -80,7 +91,7 @@
         <label for="exampleInputPassword3">RF-No</label>
         <input type="text"  name="RF" id="exampleInputPassword3" placeholder="Reference" required>
     </div>
-    <button class="button1" style="margin-left:5px;" type="submit" >Submit</button>
+    <button class="button1"  style="margin-left:5px;" onclick="ABC()" type="submit" >Submit</button>
     <button class="button1" onclick="closeForm()" >Cancel</button>
 </div>
 </form>
@@ -103,7 +114,7 @@
                 <label style="margin-left:10px;" for="exampleInputPassword1">#RF-No </label>
                 <input style="margin-left:10px;" type="text" name="RF"  id="exampleInputPassword1" placeholder="Reference Number" required>
             </div>
-            <button class="button1" style="margin-left:5px;" type="submit" >Submit</button>
+            <button onclick="ABC()" class="button1" style="margin-left:5px;" type="submit" >Submit</button>
             <button class="button1" style="" onclick="closeForm1()" >Cancel</button>
         </div>
     </form>
@@ -124,7 +135,7 @@
                 <label style="margin-left:10px;" for="exampleInputPassword2">#RF-No </label>
                 <input style="margin-left:10px;" name="RF" type="text"  id="exampleInputPassword2" placeholder="Reference Number" required>
             </div>
-            <button class="button1" style="margin-left:5px;" type="submit" >Submit</button>
+            <button onclick="ABC()" class="button1" style="margin-left:5px;" type="submit" >Submit</button>
             <button class="button1" style="" onclick="closeForm2()" >Cancel</button>
         </div>
     </form>
@@ -133,9 +144,6 @@
 
 <div id="jumaia" style="display:block;border 2px black; margin-top:10px;">
     <h1>Other Websites</h1>
-<!--    <p><strong>In below Form Put Comma separated links of all the products into Link input field that you want to Buy from Jumaia.com.ng</strong></p>-->
-<!--    <p>Example https//:A, https//:b , https//:C</p>-->
-<!--    <p><strong>And in the Price field enter total price After adding Price of all the products you want to buy</strong></p>-->
 
     <form  action="{% url 'jumaia_scraper' %}" method="POST">
         <div class="con">
@@ -166,34 +174,66 @@
         </div>
     </form>
     <hr style="margin:0px;display:dark;margin-bottom:2px;"/>
-    <a href="{% url 'jumaia_scraper1' %}"><button  class="" style="margin-left:5px;align:center;" >Submit</button></a>
+    <a href="{% url 'jumaia_scraper1' %}"><button onclick="ABC()"  class="" style="margin-left:5px;align:center;" >Submit</button></a>
 </div>
 
 
     <!--arikair.com form -->
     <div id="moneytransfer" style="display:none;border 2px black; margin-top:10px;">
-        <h1>Bank Information</h1>
-        <form  action="http://app.nuban.com.ng/api/NUBAN-TKLGONRH525" method="POST">
-            <div class="con">
-                {% csrf_token %}
-                <h1 style="">Enter Your Account Number</h1>
-                <div class="A_input">
-                    <label style="margin-left:10px;" for="acc_no">#AC-No </label>
-                    <input style="margin-left:10px;" name="acc_no" type="text"  id="acc_no" placeholder="Account Number" required>
-                </div>
-                <button class="button1" style="margin-left:5px;" type="submit" >Submit</button>
-                <button class="button1" style="" onclick="closeForm4()" >Cancel</button>
-            </div>
-        </form>
+<!--        <h1>Bank Information</h1>-->
+<!--        <form  action="{% url 'money_transfer' %}" method="POST">-->
+<!--            <div class="con">-->
+<!--                {% csrf_token %}-->
+<!--                <h1 style="">Enter Bank Details</h1>-->
+<!--                <div class="A_input">-->
+<!--                    <label style="margin-left:10px;" for="acc_no">#AC-No </label>-->
+<!--                    <input style="margin-left:10px;" name="acc_no" type="text"  id="acc_no" placeholder="Account Number" required>-->
+<!--                </div>-->
+<!--                <div class="A_input">-->
+<!--                    <label style="margin-left:10px;" for="pay">Amount</label>-->
+<!--                    <input style="margin-left:10px;" name="pay" type="number"  id="pay" placeholder="Account Number" required>-->
+<!--                </div>-->
+<!--                <div class="A_input">-->
+<!--                    <label style="margin-left:10px;" for="purpose">Purpose</label>-->
+<!--                    <input style="margin-left:10px;" name="purpose" type="text"  id="purpose" placeholder="Account Number" required>-->
+<!--                </div>-->
+
+<!--                <button class="button1" style="margin-left:5px;" type="submit" onclick="ABC()">Submit</button>-->
+<!--                <button class="button1" style="" onclick="closeForm4()" >Cancel</button>-->
+<!--            </div>-->
+<!--        </form>-->
     </div>
-
-
-
-
-
 </div>
 
+
 <div style="margin-bottom:100px;"></div>
+</div>
+
+ <div class="form-popup" id="myForm" style="float:initial;">
+<svg viewbox="0 0 100 20">
+  <defs>
+    <linearGradient id="gradient" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="10%" stop-color="black"/>
+      <stop offset="90%" stop-color="Blue"/>
+    </linearGradient>
+    <pattern id="wave" x="0" y="0" width="120" height="20" patternUnits="userSpaceOnUse">
+      <path id="wavePath" d="M-40 9 Q-30 7 -20 9 T0 9 T20 9 T40 9 T60 9 T80 9 T100 9 T120 9 V20 H-40z" mask="url(#mask)" fill="url(#gradient)">
+        <animateTransform
+            attributeName="transform"
+            begin="0s"
+            dur="1.5s"
+            type="translate"
+            from="0,0"
+            to="40,0"
+            repeatCount="indefinite" />
+      </path>
+    </pattern>
+  </defs>
+  <text text-anchor="middle" x="50" y="15" font-size="27" fill="url(#wave)"  fill-opacity="0.6">wait.!!!</text>
+  <text text-anchor="middle" x="50" y="15" font-size="27" fill="url(#gradient)" fill-opacity="0.1">wait.!!!</text>
+</svg>
+
+ </div>
 
 
 
@@ -272,14 +312,14 @@ function showPage() {
   document.getElementById("myDiv").style.display = "block";
 }
 
+function ABC(){
+  document.getElementById("myForm").style.display = "block";
+  document.getElementById("test").style.opacity = "0.1";
+  document.getElementById("test").style.backgroundColor = "Blue";
+
+}
+
 </script>
-
-
-
-<script></script>
-
-
-
 
 
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js" integrity="sha384-q2kxQ16AaE6UbzuKqyBE9/u/KzioAlnx2maXQHiDX9d4/zp8Ok3f+M7DPm+Ib6IU" crossorigin="anonymous"></script>

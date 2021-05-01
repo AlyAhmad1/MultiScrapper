@@ -28,17 +28,22 @@
                     <a href="{% url 'manager' %}"><button class="button1" onclick="" style="margin-top:8px;width:auto;" type="submit" >Home</button></a>
                 </li>
                 <li class="nav-item active" style="margin-left:5px;width:auto;">
-                    <a href="{% url 'managerD' 'ARIKAIR' %}" ><button class="button1" onclick="" style="margin-top:8px;" type="submit" >Arikair</button></a>
+                    <a href="{% url 'all_data' web='arikair' %}" ><button class="button1" onclick="" style="margin-top:8px;" type="submit" >Arikair</button></a>
                 </li>
                 <li class="nav-item active" style="margin-left:5px;">
-                    <a href="{% url 'managerD' 'WAKANOW' %}"><button class="button1" onclick="" style="margin-top:8px;width:auto;" type="submit" >Wakanow </button></a>
+                    <a href="{% url 'all_data' web='WAKANOW' %}"><button class="button1" onclick="" style="margin-top:8px;width:auto;" type="submit" >Wakanow </button></a>
                 </li>
                 <li class="nav-item active" style="margin-left:5px;">
-                    <a href="{% url 'managerD' 'FLYAIRPEACE' %}"><button class="button1" onclick="" style="margin-top:8px;width:auto;" type="submit" >Airpeace </button></a>
+                    <a href="{% url 'all_data' web='airpeace' %}"><button class="button1" onclick="" style="margin-top:8px;width:auto;" type="submit" >Airpeace </button></a>
                 </li>
                 <li class="nav-item active" style="margin-left:5px;" >
-                    <a href="{% url 'managerD' 'OTHERS' %}"><button class="button1" onclick="" style="margin-top:8px;width:auto;" type="submit" >Others</button></a>
+                    <a href="{% url 'all_data' web='jumaia' %}"><button class="button1" onclick="" style="margin-top:8px;width:auto;" type="submit" >Others</button></a>
                 </li>
+                <li class="nav-item active" style="margin-left:5px;" >
+                    <a href=""></a>
+<!--                    <a href="{% url 'all_data' web='OTHERS' %}"><button class="button1" onclick="" style="margin-top:8px;width:auto;" type="submit" >Payments</button></a>-->
+                </li>
+
                 <li class="nav-item active" style="margin-left:5px;" >
                     <a href="{% url 'logout' %}"><button class="button1" style="margin-top:8px;width:auto;" type="submit" >Logout</button></a>
                 </li>

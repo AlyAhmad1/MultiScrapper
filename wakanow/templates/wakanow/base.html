@@ -49,15 +49,16 @@
             {% endblock %}
             {% block right_panel_1 %}
             {% if Details|last != 0 %}
+
             <li class="nav-item active" style="margin-left:880;">
-                <a href="{% url 'payment' Amount=Details|last ALLData=Compress_data Temp=0 %}" class="nav-link"><button class="button1" style="margin-top:0px;" type="submit" >Pay</button></a>
+<!--                <a href="{% url 'payment' Amount=Details|last ALLData=Compress_data web=web %}" class="nav-link"><button class="button1" style="margin-top:0px;" type="submit" >Pay</button></a>-->
+                <a class="nav-link"><button class="button1" onclick="ABC()" style="margin-top:0px;" type="submit" >Pay</button></a>
+
             </li>
             {% endif %}
-<!--            <li class="nav-item active" >-->
-<!--                <a href="#" class="nav-link" onclick="history.go(-1)"><button style="margin-top:0px;" class="button1">Back</button></a>-->
-<!--            </li>-->
+
             <li class="nav-item active" >
-                <a href="{% url 'home' %}" class="nav-link"><button style="margin-top:0px;" class="button1">Back</button></a>
+                <a class="nav-link"><button onclick="goBack()" style="margin-top:0px;" class="button1">Back</button></a>
             </li>
             {% endblock %}
 
@@ -66,14 +67,13 @@
             {% block right_panel_2 %}
             {% if Total != 0 %}
             <li class="nav-item active" style="margin-left:880" >
-                <a href="{% url 'payment' Amount=Total ALLData=D Temp=1 %}" class="nav-link"><button class="button1" style="margin-top:0px;" type="submit" >Pay</button></a>
+<!--                <a href="{% url 'payment' Amount=Total ALLData=Items web=web %}" class="nav-link"><button class="button1" onclick="ABC()" style="margin-top:0px;" type="submit" >Pay</button></a>-->
+                <a class="nav-link"><button class="button1" onclick="ABC()" style="margin-top:0px;" type="submit" >Pay</button></a>
             </li>
             {% endif %}
-<!--            <li class="nav-item active" >-->
-<!--                <a href="#" class="nav-link" onclick="history.go(-1)"><button style="margin-top:0px;" class="button1">Back</button></a>-->
-<!--            </li>-->
+
             <li class="nav-item active" >
-                <a href="{% url 'home' %}" class="nav-link"><button style="margin-top:0px;" class="button1">Back</button></a>
+                <a class="nav-link"><button onclick="goBack()" style="margin-top:0px;" class="button1">Back</button></a>
             </li>
             {% endblock %}
 
@@ -99,6 +99,13 @@
 
 {% endblock %}
 </div>
+
+
+<script>
+function goBack() {
+  window.history.back();
+}
+</script>
 
 
 <script>

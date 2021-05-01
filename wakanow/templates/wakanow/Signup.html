@@ -26,9 +26,13 @@
     <form class="form-signin" action="" method="POST">
     <h1 class="h3 mb-3 font-weight-normal">SignUp</h1>
     {% csrf_token %}
+       <input type="text" style="width:40%; display:inline-block;margin-bottom:10px;" name="fname" id="fname" class ="form-control" placeholder="Fist Name" required autofocus>
+       <input type="text" style="width:40%;display:inline;margin-bottom:10px;" name="lname" id="lname" class ="form-control" placeholder="Last Name" required autofocus>
        <input type="email" id="inputEmail" name="Email" class ="form-control" placeholder="Email address" required autofocus>
        <input style ="margin-top:10px;"  type="password" name="Password" id="inputPassword" class="form-control" placeholder="Password" required>
-    <button style="margin-top:30px;" class="btn btn-lg btn-primary btn-block" type="submit">Signup</button>
+            <input style ="margin-top:10px;" name="Password1" type="password" id="confirmpassword" class="form-control" placeholder="Confirm Password" max="8" required>
+
+        <button id="check" style="display:none;margin-top:30px;" class="btn btn-lg btn-primary btn-block" type="submit">Signup</button>
         <p class="mt-5 mb-3 text-muted">Already have Account? <a href="{% url 'login'%}"> Click Here </a>To Signin</p>
 <!--        <p class="mt-5 mb-3 text-muted">Powered By Ali Ahmad</p>-->
     </form>
@@ -51,6 +55,20 @@ function showPage() {
   document.getElementById("myDiv").style.display = "block";
 }
 
+</script>
+<script>
+    $('#inputPassword, #confirmpassword').on('keyup', function () {
+
+  if ($('#inputPassword').val() == $('#confirmpassword').val()) {
+    $('#confirmpassword').css('background-color', '#9fff80');
+      document.getElementById("check").style.display = "block";
+
+  } else
+    {
+    $('#confirmpassword').css('background-color', '#ff9980');
+      document.getElementById("check").style.display = "none";
+    }
+});
 </script>
 
 

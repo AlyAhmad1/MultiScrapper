@@ -9,7 +9,7 @@ Check = []
 
 
 def form_data(request):
-    global Total,D, Check
+    global Total, D, Check
     D.clear()
     if request.method == 'POST':
         website = request.POST.get('website')
@@ -27,13 +27,14 @@ def All_data(request):
     for i in Check:
         D.append(i)
     Items = json.dumps(D)
-    Data = {'D': D, 'Total':Total,'Items':Items}
+    web = 'jumaia'
+    Data = {'D': D, 'Total': Total, 'Items': Items, 'web': web}
     Check.clear()
     Total = 0
     return render(request, 'jumaia/details.html', Data)
 
 
-def data_update(request,index, whole, T):
+def data_update(request, index, whole, T):
     global Total, Check, D
     whole = str(whole).strip("'<>() ").replace('\'', '\"')
     whole = json.loads(whole)

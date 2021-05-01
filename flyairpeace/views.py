@@ -1,18 +1,21 @@
 from django.shortcuts import render
 from selenium.webdriver.common.by import By
 from selenium import webdriver
-import time
+import time, json
 from django.contrib import messages
 
 Details = []
+
 
 def form_data(request):
     global Details
     if request.method == 'POST':
         Name = request.POST['Name']
         Reference = request.POST['RF']
-        Details = scraper_form(request,Name,Reference)
-        Data = {'Details':Details}
+        Detail, data_show = scraper_form(request,Name,Reference)
+        Compress_data = json.dumps(Detail)
+        web = 'airpeace'
+        Data = {'Details': Detail, 'Compress_data': Compress_data, 'web': web, 'data_show': data_show}
         return render(request, 'wakanow/Details.html', Data)
     Data = {'Details':''}
     return render(request, 'wakanow/Index.html', Data)
@@ -22,21 +25,21 @@ def scraper_form(request, Name, Reference):
     global Details
     Details.clear()
 
-    # options = webdriver.ChromeOptions()
-    # options.add_argument("headless")
-    # options.add_argument("window-size=1500,1200")
-    # options.add_argument("no-sandbox")
-    # options.add_argument("disable-dev-shm-usage")
-    # options.add_argument("disable-gpu")
-    # options.add_argument("log-level=3")
-    # options.add_argument("--disable-xss-auditor")
-    # options.add_argument("--disable-web-security")
-    # options.add_argument("--allow-running-insecure-content")
-    # options.add_argument("--disable-setuid-sandbox")
-    # options.add_argument("--disable-webgl")
-    # options.add_argument("--disable-popup-blocking")
-    # driver = webdriver.Chrome(chrome_options=options)
-    driver = webdriver.Chrome()
+    options = webdriver.ChromeOptions()
+    options.add_argument("headless")
+    options.add_argument("window-size=1500,1200")
+    options.add_argument("no-sandbox")
+    options.add_argument("disable-dev-shm-usage")
+    options.add_argument("disable-gpu")
+    options.add_argument("log-level=3")
+    options.add_argument("--disable-xss-auditor")
+    options.add_argument("--disable-web-security")
+    options.add_argument("--allow-running-insecure-content")
+    options.add_argument("--disable-setuid-sandbox")
+    options.add_argument("--disable-webgl")
+    options.add_argument("--disable-popup-blocking")
+    driver = webdriver.Chrome(chrome_options=options)
+    # driver = webdriver.Chrome()
     try:
         driver.get("https://www.flyairpeace.com/managebooking.php")
         # time.sleep(15)
@@ -53,7 +56,6 @@ def scraper_form(request, Name, Reference):
                 except:
                     time.sleep(5)
                     A = driver.find_elements_by_tag_name('iframe')[0]
-
 
         driver.switch_to.frame(A)
         try:
@@ -74,12 +76,14 @@ def scraper_form(request, Name, Reference):
         Name = ['Wrong Login Info  Try  Again!!', 0]
         return Name
     try:
-        Name = data_scraper(request, driver)
-        return Name
+        Name,data_show = data_scraper(request, driver)
+
+        return Name,data_show
     except:
         messages.error(request,'No Data Found')
         Name = ['No Data Found', 0]
-        return Name
+        data_show = []
+        return Name,data_show
 
 
 def data_scraper(request, driver):
@@ -94,14 +98,10 @@ def data_scraper(request, driver):
             time.sleep(5)
             Z = driver.find_elements_by_tag_name('ul')
 
-
-
-
     try:
-        # Name = Z[2].text
         N = Z[2].find_elements_by_tag_name('div')
-        Name = 'Passenger\t'+ str(N[1].text)
-        Details = 'Details\t'+ str(N[2].text)
+        Name = str(N[1].text)
+
         try:
             Z[0].find_elements_by_tag_name('li')[3].click()
         except:
@@ -123,31 +123,40 @@ def data_scraper(request, driver):
                 except:
                     time.sleep(5)
                     p = driver.find_elements_by_class_name('panel-body')[0].find_elements_by_tag_name('div')
-
-
-        Flight = 'Flight From\t' + str(p[3].text)
-        Flight_No = 'Flight No\t' + str(p[7].text)
-        Departure_Time = 'Departure Time\t' + str(p[10].text)
-        Arrival_time = 'Arrival Time\t'+ str(p[13].text)
-        Fare_Type = 'Fare Type\t'+ str(p[14].text)
-        Net_fare = 'Net Fare\t'+ str(p[19].text)
-        Tax = 'Tax\t'+ str(p[22].text)
-        Total = 'Total\t'+ str(p[25].text)
-        T = p[25][:-3].text
+        try:
+            Adult = str(p[2].text)
+        except:
+            Adult = 0
+        try:
+            child = str(p[5].text)
+        except:
+            child = 0
+        Flight = str(p[4].text)
+        Flight_No = str(p[7].text)
+        Departure_Time = str(p[13].text)
+        Arrival_time = str(p[14].text)
+        Fare_Type = str(p[14].text)
+        Net_fare = str(p[19].text)
+        Tax = str(p[22].text)
+        T = p[-1].text
+        print('---------')
+        T = T[:-3]
+        print(T)
         Total_Amout_pay = ''
+
         for i in T.split(','):
             Total_Amout_pay += i
-        print('-------------------')
-        print(Total_Amout_pay)
-        print('-------------------')
-
         try:
             Total_Amout_pay = int(float(Total_Amout_pay))
         except:
             Total_Amout_pay = float(Total_Amout_pay)
-
-        Main = [Name, Details, Flight,Flight_No, Departure_Time, Arrival_time, Fare_Type,Net_fare, Tax, Total,T,Total_Amout_pay]
-        return Main
-    except :
-           raise Exception('No Data found In this Account')
+        Main = [Name, Adult, child, Flight,Flight_No, Departure_Time, Arrival_time, Fare_Type, Net_fare, Tax, Total_Amout_pay]
+        # data_show = ["Passenger Name:\t" + Name, "Flight Name:\t"+Flight,
+        #              "Flight No:\t" + Flight_No, "Fare Type:\t"+Fare_Type, "Net Fare:\t"+Net_fare,
+        #              "Tax:\t"+Tax, "Bill:\t"+T]
+        data_show = ["Passenger Name:\t" + Name, "Bill:\t"+T]
+        return Main,data_show
+    except Exception as E:
+        print(E)
+        raise Exception('No Data found In this Account')
 

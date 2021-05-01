@@ -1,22 +1,24 @@
 from django.shortcuts import render
 from selenium import webdriver
-import time
+import time, json
 from django.contrib import messages
 
 Details = []
+
 
 def form_data(request):
     global Details
     if request.method == 'POST':
         Name = request.POST.get('Name')
         Reference = request.POST.get('RF')
-        print(Name, Reference)
         N=Name.strip()
         R=Reference.strip()
-        Details = scraper_form(request,N,R)
-        Data = {'Details':Details}
+        Details, data_show = scraper_form(request, N, R)
+        Compress_data = json.dumps(Details)
+        web = 'arikair'
+        Data = {'Details': Details, 'Compress_data': Compress_data, 'web': web, 'data_show':data_show}
         return render(request, 'wakanow/Details.html', Data)
-    Data = {'Details':''}
+    Data = {'Details': ''}
     return render(request, 'wakanow/Index.html', Data)
 
 
@@ -64,12 +66,13 @@ def scraper_form(request, Name, Reference):
         messages.error(request, 'Wrong Login Info \n Try  Again!!')
         Name = ['Wrong Login Information Try Again!!', 0]
         return Name
-    Name = data_scraper(request, driver)
+    Name, data_Show = data_scraper(request, driver)
     if not Name:
         messages.error(request, 'error in Page loading check your internet connection')
         Name = ['No Data Found', 0]
-        return Name
-    return Name
+        data_show = []
+        return Name, data_show
+    return Name,data_Show
 
 
 def data_scraper(request, driver):
@@ -92,41 +95,48 @@ def data_scraper(request, driver):
             Name_detail = Z[0].find_elements_by_tag_name('tr')[1].find_elements_by_tag_name('td')
 
         try:
-            Flight = 'Flight Number:\t' + str(Name_detail[0].text)
+            Flight = str(Name_detail[0].text)
         except:
             time.sleep(5)
-            Flight = 'Flight Number:\t' + str(Name_detail[0].text)
+            Flight = str(Name_detail[0].text)
 
-        Passanger = 'Passenger :\t' + str(Name_detail[1].text)
+        Passanger = str(Name_detail[1].text)
 
         # Flight Details
         Flight_detail = Z[1].find_elements_by_tag_name('tr')[1].find_elements_by_tag_name('td')
-        From = 'Moving From:\t' + str(Flight_detail[0].text)
-        To = 'Destination :\t' + str(Flight_detail[1].text)
-        Date = 'Date:\t' + str(Flight_detail[3].text)
-        Time = 'Time:\t' + str(Flight_detail[4].text)
-        Seat = 'Seat Number:\t' + str(Flight_detail[6].text)
-        Total_bagage = 'Baggage:\t'+ str(Flight_detail[7].text)
+        From = str(Flight_detail[0].text)
+        To = str(Flight_detail[1].text)
+        Date = str(Flight_detail[3].text)
+        Time = str(Flight_detail[4].text)
+        Total_bagage = str(Flight_detail[7].text)
+
         # Payment Details
-        Payment_detail = Z[3].find_elements_by_tag_name('tr')
-        Tiket_fare = 'Ticket Fare:\t'+ str(Payment_detail[0].find_elements_by_tag_name('td')[1].text)
-        Tax = 'Tax:\t' + str(Payment_detail[1].find_elements_by_tag_name('td')[1].text)
-        Surcharge = 'Surcharge:\tt'+ str(Payment_detail[2].find_elements_by_tag_name('td')[1].text)
-        service = 'Service:\t'+ str(Payment_detail[3].find_elements_by_tag_name('td')[1].text)
-        insurance_fee = 'Insurance Fee:\t'+ str(Payment_detail[4].find_elements_by_tag_name('td')[1].text)
-        Total = 'Total_Amount:\t' + str(Payment_detail[5].find_elements_by_tag_name('td')[1].text)
-        T = Payment_detail[5].find_elements_by_tag_name('td')[1].text[:-3]
+        Payment_detail = Z[-3].find_elements_by_tag_name('tr')
+        Tiket_fare = str(Payment_detail[0].find_elements_by_tag_name('td')[1].text)
+        Tax = str(Payment_detail[1].find_elements_by_tag_name('td')[1].text)
+        Surcharge = str(Payment_detail[2].find_elements_by_tag_name('td')[1].text)
+        service = str(Payment_detail[3].find_elements_by_tag_name('td')[1].text)
+        insurance_fee = str(Payment_detail[4].find_elements_by_tag_name('td')[1].text)
+        # Total = 'Total_Amount:\t' + str(Payment_detail[5].find_elements_by_tag_name('td')[1].text)
+        T = Payment_detail[5].find_elements_by_tag_name('td')[1].text
+        T = T[:-3]
         Total_Amout_pay = ''
         for i in T.split(','):
             Total_Amout_pay += i
-        print(Total_Amout_pay)
         try:
             Total_Amout_pay = int(float(Total_Amout_pay))
         except:
             Total_Amout_pay = float(Total_Amout_pay)
-        WEBSITE = 'AIKAIRPEACE'
-        All = [WEBSITE,Passanger,Flight,From,To,Date,Time,Seat,Total_bagage,Tiket_fare, Tax, Surcharge, service,insurance_fee,Total, Total_Amout_pay]
+
+        da = [Passanger, Flight, From, To, Date, Time, Total_bagage, Tiket_fare, Tax, Surcharge, service,
+              insurance_fee, Total_Amout_pay]
+        data_show = ['Passenger:\t'+Passanger, 'Flight No:\t', 'Starting:\t'+From, "Destination\t"+To,
+                     "Date:\t"+Date, "Time:\t"+Time, "Bagage:\t"+Total_bagage,
+                     "Ticket Fare:\t"+Tiket_fare, "Tax:\t"+Tax, "Surcharge:\t"+Surcharge,
+                     "Service:\t"+service, "Insurance Fee:\t"+insurance_fee,
+                     "Total Bill:\t"+T]
 
     except:
-        All = False
-    return All
+        da = False
+        data_show = []
+    return da,data_show

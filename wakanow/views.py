@@ -3,10 +3,14 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from . import login_required
+from django.http import HttpResponse
+from .models import WakanowScrape, BeforePaymentData
+from arikair.models import ArikData
+from flyairpeace.models import AirpeaceScraper
+from jumaia.models import JumaiaScraper
 from selenium import webdriver
 import time
 from django.contrib import messages
-import requests
 from arikair.models import RegisteredUsers, MailOTP
 from MultiS.settings import EMAIL_HOST_USER
 from django.core.mail import send_mail
@@ -15,27 +19,32 @@ import datetime
 from urllib.parse import unquote
 from django.utils import timezone
 import json
-import _pickle as pickle
+import requests
 
 Details = []
 
+# these variables will be used to save information of scraper and account
+ALLDATA, ACCOUNT, WEB = [], {}, ''
+
+
 def form_data(request):
     if request.method == 'POST':
-        Name = request.POST['Name']
-        Email = request.POST['Email']
-        Reference = request.POST['RF']
-        E=Email.strip()
-        N=Name.strip()
-        R=Reference.strip()
-        Details = scraper_form(request,E,N,R)
+        name = request.POST['Name']
+        email = request.POST['Email']
+        reference = request.POST['RF']
+        e = email.strip()
+        n = name.strip()
+        r = reference.strip()
+        Details, data_show = scraper_form(request, e, n, r)
         Compress_data = json.dumps(Details)
-        Data = {'Details': Details, 'Compress_data': Compress_data}
-        return render(request, 'wakanow/Details.html', Data)
-    Data = {'Details':''}
-    return render(request, 'wakanow/Index.html', Data)
+        web = 'WAKANOW'
+        data = {'Details': Details, 'Compress_data': Compress_data, 'web': web, 'data_show':data_show}
+        return render(request, 'wakanow/Details.html', data)
+    data = {'Details': ''}
+    return render(request, 'wakanow/Index.html', data)
 
 
-def scraper_form(request, Email, Name, Reference):
+def scraper_form(request, email, name, reference):
     global Details
     Details.clear()
     options = webdriver.ChromeOptions()
@@ -64,23 +73,23 @@ def scraper_form(request, Email, Name, Reference):
                 EC.presence_of_element_located((By.TAG_NAME, "main")))
 
         try:
-            link = driver.find_elements(By.TAG_NAME,'div')[21]
+            link = driver.find_elements(By.TAG_NAME, 'div')[21]
         except:
             try:
                 time.sleep(5)
-                link = driver.find_elements(By.TAG_NAME,'div')[21]
+                link = driver.find_elements(By.TAG_NAME, 'div')[21]
             except:
                 try:
                     time.sleep(5)
-                    link = driver.find_elements(By.TAG_NAME,'div')[21]
+                    link = driver.find_elements(By.TAG_NAME, 'div')[21]
                 except:
                     try:
                         time.sleep(5)
-                        link = driver.find_elements(By.TAG_NAME,'div')[21]
+                        link = driver.find_elements(By.TAG_NAME, 'div')[21]
                     except:
                         messages.error(request, 'ERRORR')
-                        Name = ['Wrong Login Info  Try  Again!!', 0]
-                        return Name
+                        ame = ['Wrong Login Info  Try  Again!!', 0]
+                        return ame
         try:
             link.click()
         except:
@@ -88,52 +97,50 @@ def scraper_form(request, Email, Name, Reference):
             link.click()
 
         try:
-            FORM = driver.find_element(By.TAG_NAME,'form')
+            f = driver.find_element(By.TAG_NAME, 'form')
         except:
             time.sleep(5)
-            FORM = driver.find_element(By.TAG_NAME,'form')
+            f = driver.find_element(By.TAG_NAME, 'form')
 
-        input_list = FORM.find_elements(By.TAG_NAME, 'input')
+        input_list = f.find_elements(By.TAG_NAME, 'input')
 
-        input_list[0].send_keys(Reference)
-        input_list[1].send_keys(Name)
-        input_list[2].send_keys(Email)
-        FORM.find_element(By.TAG_NAME,'button').click()
+        input_list[0].send_keys(reference)
+        input_list[1].send_keys(name)
+        input_list[2].send_keys(email)
+        f.find_element(By.TAG_NAME, 'button').click()
 
     except:
         messages.error(request, 'Wrong Login Information Try  Again!!')
-        Name = ['Wrong Login Info  Try  Again!!', 0]
-        return Name
+        ame = ['Wrong Login Info  Try  Again!!', 0]
+        return ame
 
     try:
-        Name=data_scraper(request,driver)
-        return Name
+        ame,data_show = data_scraper(request, driver)
+        return ame,data_show
     except:
         messages.error(request, 'No Data Found')
-        Name = ['No Data Found',0]
-        return Name
+        ame = ['No Data Found', 0]
+        data_show = []
+        return ame, data_show
 
 
 def data_scraper(request, driver):
     try:
-        All_data = WebDriverWait(driver, 10).until(
+        all_data = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.ID, "cards")))
     except:
-        All_data = WebDriverWait(driver, 10).until(
+        all_data = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.ID, "cards")))
-
-    # All_data = driver.find_element(By.ID,'cards')
-
     try:
-        N = All_data.find_element(By.TAG_NAME,'app-passenger-details').find_elements(By.TAG_NAME, 'p')
+        n = all_data.find_element(By.TAG_NAME,'app-passenger-details').find_elements(By.TAG_NAME, 'p')
     except:
         time.sleep(5)
-        N = All_data.find_element(By.TAG_NAME,'app-passenger-details').find_elements(By.TAG_NAME, 'p')
+        n = all_data.find_element(By.TAG_NAME,'app-passenger-details').find_elements(By.TAG_NAME, 'p')
 
-
-    Name = str(N[1].text)
-    Email = str(N[2].text)
-    Contact = str(N[3].text)
+    name = str(n[1].text)
+    email = str(n[2].text)
+    contact = str(n[3].text)
+    details = str(n[5].text)
 
     driver.maximize_window()
     try:
@@ -144,42 +151,54 @@ def data_scraper(request, driver):
         except Exception as e:
             raise e
 
-    data = driver.find_elements(By.TAG_NAME,'i')
+    data = driver.find_elements(By.TAG_NAME, 'i')
     try:
+        data[8].click()
         data[9].click()
-        data[10].click()
-        data[11].click()
+        # data[10].click()
+        # data[11].click()
     except Exception as E:
+        print('---')
+        print(E)
+        print('-------')
         raise E
-
-    F = All_data.find_element(By.TAG_NAME,'app-mbb-flight-details').find_elements(By.TAG_NAME, 'p')
-    Location = str(F[3].text)
-    Date = str(F[1].text)
-    Time = str(F[2].text)
-    Flight = str(F[4].text) + str(F[5].text)
-    T_Time = str(F[6].text)
-
-
-    P = All_data.find_element(By.TAG_NAME,'app-pss-details').find_elements(By.TAG_NAME, 'p')
-    Total= str(P[1].text)
-    Paid= str(P[3].text)
-    Outstanding= str(P[5].text)
-    T = P[5].text
-    T = T[1:]
-
-    Total_Amout_pay = ''
-    for i in T.split(','):
-        Total_Amout_pay += i
     try:
-        Total_Amout_pay = int(float(Total_Amout_pay))
-    except:
-        Total_Amout_pay = float(Total_Amout_pay)
+        ff = all_data.find_element(By.TAG_NAME, 'app-mbb-flight-details').find_elements(By.TAG_NAME, 'p')
+        location = str(ff[3].text)
+        date = str(ff[1].text)
+        t = str(ff[2].text)
+        flight = str(ff[4].text) + str(ff[5].text)
+        t_time = str(ff[6].text)
+        p = all_data.find_element(By.TAG_NAME, 'app-payment-details').find_elements(By.TAG_NAME, 'p')
+        total = str(p[1].text)
+        amount_paid = str(p[3].text)
+        outstanding = str(p[5].text)
+        tt = outstanding[1:]
+        total_amount_pay = ''
+        for i in tt.split(','):
+            total_amount_pay += i
+        try:
+            total_amount_pay = int(float(total_amount_pay))
+        except:
+            total_amount_pay = float(total_amount_pay)
 
-    All = [Name,Email,Contact,Location,Date,Time,Flight,T_Time,Total,Paid,Outstanding, T, Total_Amout_pay]
-    return All
+        d = [name, email, contact, details, location, date, t, flight, t_time, total, amount_paid, outstanding,
+             total_amount_pay]
+
+        data_show = ['Passenger:\t' + name,'Passenger Email:\t'+email,'Details:\t'+details,
+                     'Travel:\t'+location, "Date:\t" + date, "Time:\t" +t, "Bill:\t" + total,
+                     "Amount Pay:\t" + amount_paid, "Outstanding:\t" + outstanding]
+
+        return d, data_show
+    except Exception as E:
+        print(E)
+
 
 @login_required
 def home(request):
+    if request.session['user'] == 'Admin12345678910!':
+        return render(request, 'manager/manager_index.html')
+
     return render(request, 'wakanow/Index.html')
 
 
@@ -187,18 +206,14 @@ def sign_in(request):
     if request.method == 'POST':
         email = request.POST['Email']
         password = request.POST['Password']
-        all_users = RegisteredUsers.objects.all()
-        for i in range(0, len(all_users)):
-            if all_users[i].Email != email or all_users[i].Password != password :
-                messages.error(request, 'Incorrect Email')
-                return render(request, 'wakanow/login.html')
-            if all_users[i].Email == email and all_users[i].Password != password :
-                messages.error(request, 'Incorrect Password')
-                return render(request, 'wakanow/login.html')
-            if all_users[i].Email == email and all_users[i].Password == password:
-                request.session['user'] = str(email).split('@')[0]
-                request.session['email'] = email
-                return redirect('home')
+        all_users = RegisteredUsers.objects.filter(Email=email,Password=password)
+        if all_users:
+            request.session['user'] = all_users[0].FName
+            request.session['email'] = email
+            return redirect('home')
+        else:
+            messages.error(request, 'Invalid Email or Password')
+            return render(request, 'wakanow/login.html')
     return render(request, 'wakanow/login.html')
 
 
@@ -206,24 +221,25 @@ def register_user(request):
     if request.method == 'POST':
         email = request.POST['Email']
         password = request.POST['Password']
+        fname = request.POST['fname']
+        lname = request.POST['lname']
 
         # email Checking
-        api_key = "f4bbfa4a-a896-4ddc-9e2d-10ae1cb45775"
+        api_key = "996ad77f-aeb0-478b-936c-5c0ee5838da5"
         response = requests.get("https://isitarealemail.com/api/email/validate", params={'email': email},
                                 headers = {'Authorization': "Bearer " + api_key })
         status = response.json()['status']
         if status == "invalid":
             messages.error(request, 'Invalid Email')
             return render(request, 'wakanow/Signup.html')
-        all_users = RegisteredUsers.objects.all()
-        for i in range(0, len(all_users)):
-            if all_users[i].Email==request.POST['Email']:
-                messages.error(request, 'Email Already Exists')
-                return render(request, 'wakanow/Signup.html')
-        data = RegisteredUsers(Email=email, Password=password)
+        all_users = RegisteredUsers.objects.filter(Email=email)
+        if all_users:
+            messages.error(request, 'Email Already Exists')
+            return render(request, 'wakanow/Signup.html')
+        data = RegisteredUsers(Email=email, Password=password, FName=fname, LName=lname)
         RegisteredUsers.save(data)
         request.session['email'] = email
-        request.session['user'] = str(email).split('@')[0]
+        request.session['user'] = fname
         messages.error(request, 'Successfully Register')
         return redirect('home')
     return render(request, 'wakanow/Signup.html')
@@ -234,10 +250,11 @@ def logout(request):
     del request.session['email']
     return redirect('login')
 
+
 def reset_password_email(request):
     if request.method == 'POST':
         email = request.POST['Email']
-        check_email_exists =RegisteredUsers.objects.filter(Email__iexact=email)
+        check_email_exists = RegisteredUsers.objects.filter(Email__iexact=email)
         if check_email_exists.exists():
             key = genotp(email)
             if key:
@@ -246,24 +263,24 @@ def reset_password_email(request):
                 now = timezone.now()
                 expiry = (now + two_minute)
 
-
                 subject = 'Reset Password'
                 message = f'Below is your reset password pin {key}'
-                recepient = email
+                receiver = email
 
-                Add_otp=MailOTP(
+                add_otp = MailOTP(
                     Email=email,
                     OTP=key,
                     timestamp=expiry)
-                MailOTP.save(Add_otp)
+                MailOTP.save(add_otp)
                 cofirmed_email = RegisteredUsers.objects.get(Email=email)
-                email=cofirmed_email.id
-                send_mail(subject, message, EMAIL_HOST_USER, [recepient], fail_silently = False)
+                email = cofirmed_email.id
+                send_mail(subject, message, EMAIL_HOST_USER, [receiver], fail_silently=False)
                 return redirect('reset_pass', email=email)
         else:
             messages.error(request, "Email Not registered")
             return render(request, 'wakanow/reset_password_enter_email.html')
     return render(request, 'wakanow/reset_password_enter_email.html')
+
 
 def genotp(email):
     if email:
@@ -271,24 +288,22 @@ def genotp(email):
             MailOTP.objects.filter(Email=email).delete()
         except:
             pass
-        key = random.randint(9999,999999)
+        key = random.randint(9999, 999999)
         return key
     else:
         return False
 
 
 def reset_password(request, email):
-
     EE = RegisteredUsers.objects.get(id=email)
     id = email
     email = EE.Email
     if request.method == 'POST':
         otp = request.POST['otp']
         if otp:
-
             otp_confirmation = MailOTP.objects.filter(Email=email, OTP=otp)
             if otp_confirmation.exists():
-                verify =MailOTP.objects.get(Email=email)
+                verify = MailOTP.objects.get(Email=email)
                 if timezone.now() < verify.timestamp:
                     verify.delete()
                     request.session['email'] = email
@@ -324,21 +339,110 @@ def set_new_password(request, id):
         raise Exception('No OTP Provide')
 
 
-def payment(requests,Amount,ALLData,Temp):
-    # Temp =1 Jumaia/details.html
-    # Temp =0 wakanow/Details.html
-    ALLData = unquote(ALLData).strip('[]').split(',')
-    # Data = []
+def payment(request, Amount, ALLData, web):
+    if request.method == 'POST':
+        account = request.POST['acc_no']
+        purpose = request.POST['purpose']
+        ACCOUNT = money_transfer(account, purpose)
+        if ACCOUNT:
+            ACCOUNT['Amount'] = Amount
+            ACCOUNT = json.dumps(ACCOUNT)
+            Data_Show = json.loads(ACCOUNT)
+            BeforePaymentData.objects.filter(email=request.session['email']).delete()
+            BeforePaymentData(email=request.session['email'],
+                              web=web,
+                              ALL_data=ALLData,Account_data=ACCOUNT,Amount=Amount, Account=account).save()
+            return render(request, 'wakanow/Payment.html', {'ACCOUNT': Data_Show,'email': request.session['email']})
+        else:
+            messages.error(request,'Account not exist')
+            return redirect('home')
 
-    # ALLData = str(ALLData).strip("'<>() ").replace('\'', '\"')
-    ALLData = str(ALLData)
-    Data = json.loads(ALLData)
 
-    print('----------------------------')
-    print(Data)
-    print('----------------------------')
+def money_transfer(account,purpose):
+    data = requests.get(url=f'https://app.nuban.com.ng/api/NUBAN-TKLGONRH525?acc_no={account}')
+    d = data.json()
+    try:
+        if d['error']:
+            return False
+    except:
+        d = data.json()[0]
+        d['purpose'] = purpose
+        return d
 
-    # Main = [Name, Details, Flight,Flight_No, Departure_Time, Arrival_time, Fare_Type,Net_fare, Tax, Total,T]
-    # All = [Name,Email,Contact,Location,Date,Time,Flight,T_Time,Total,Paid,Outstanding, T]
 
-    return render(requests,'wakanow/Payment.html')
+def success_pay(request):
+    Data = BeforePaymentData.objects.filter(email=request.session['email'])[0]
+    d, status = transfer(Data.Account, Data.Amount)
+    while(True):
+        if status == 200:
+            if d['response_description'] == 'REQUEST ID ALREADY EXIST':
+                d, status = transfer(Data.Account, Data.Amount)
+                continue
+            break
+        else:
+            break
+    web = Data.web
+    all_data = json.loads(Data.ALL_data)
+    account_data = json.loads(Data.Account_data)
+
+    if web == 'WAKANOW':
+        wak = WakanowScrape(user_email=request.session['email'], passenger=all_data[0], passenger_email=all_data[1],
+                            details=all_data[3], flight = all_data[7], Total_Bill=all_data[9], Amount_Paid=all_data[10],
+                            Bill=all_data[11],bank_name = account_data['bank_name'],
+                            account_name= account_data['account_name'],account_number = account_data['account_number'],
+                            bank_code = account_data['bank_code'],purpose = account_data['purpose'],)
+        WakanowScrape.save(wak)
+    elif web == 'airpeace':
+        Airpeace = AirpeaceScraper(user_email=request.session['email'], passenger=all_data[0],Bill=all_data[10],
+                                   bank_name=account_data['bank_name'],
+                                   account_name=account_data['account_name'],
+                                   account_number=account_data['account_number'],
+                                   bank_code=account_data['bank_code'],
+                                   purpose=account_data['purpose']
+                                   )
+        AirpeaceScraper.save(Airpeace)
+
+    elif web == 'arikair':
+        Arik = ArikData(user_email=request.session['email'],
+                        Pessenger=all_data[0], Flight=all_data[1],
+                        Departure=all_data[2], Destination=all_data[3],
+                        Date=all_data[4], Time=all_data[5], Total_bagage=all_data[6],
+                        Tiket_fare=all_data[7], Tax=all_data[8], Surcharge=all_data[9],
+                        service=all_data[10], insurance_fee=all_data[11], Bill=all_data[12],
+                        bank_name=account_data['bank_name'],
+                        account_name=account_data['account_name'],
+                        account_number=account_data['account_number'],
+                        bank_code=account_data['bank_code'],
+                        purpose=account_data['purpose']
+                        )
+        ArikData.save(Arik)
+
+    elif web == 'jumaia':
+        new_data = json.dumps(all_data)
+        jum = JumaiaScraper(user_email=request.session['email'], All_Data=new_data, Bill=str(Data.Amount),
+                            bank_name=account_data['bank_name'],
+                            account_name=account_data['account_name'],
+                            account_number=account_data['account_number'],
+                            bank_code=account_data['bank_code'],
+                            purpose=account_data['purpose']
+                            )
+        JumaiaScraper.save(jum)
+    messages.error(request, 'Successfully transfer')
+    BeforePaymentData.objects.filter(email=request.session['email']).delete()
+    return redirect('home')
+
+
+def transfer(account_number, Amount):
+    Api_link = 'https://sandbox.vtpass.com/api/pay'
+    key = random.randint(9999, 999999)
+    A = random.randint(1, 10)
+    random_id = A * key
+    par = {'request_id': f'{random_id}',
+           'serviceID': 'bank-deposit',
+           'billersCode': '1234567890',
+           'variation_code': 'gtb',
+           'amount': f'{Amount}',
+           'phone': '+923076463373'}
+    d = requests.post(url=Api_link,auth=('aliahmad538404@gmail.com', 'damit786'), data=par )
+    status = d.status_code
+    return d.json(), status
