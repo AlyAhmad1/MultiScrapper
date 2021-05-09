@@ -54,11 +54,11 @@ svg{font-weight:bold;max-width:600px;height:auto;}
             </button>
     </div>
 
-<!--    <div class="Btn">-->
-<!--        <button onclick="openForm4()">-->
-<!--            Transfer Money-->
-<!--        </button>-->
-<!--    </div>-->
+    <div class="Btn">
+        <button onclick="openForm4()">
+            Transfer Money
+        </button>
+    </div>
 
 
     <div class="Btn">
@@ -180,28 +180,28 @@ svg{font-weight:bold;max-width:600px;height:auto;}
 
     <!--arikair.com form -->
     <div id="moneytransfer" style="display:none;border 2px black; margin-top:10px;">
-<!--        <h1>Bank Information</h1>-->
-<!--        <form  action="{% url 'money_transfer' %}" method="POST">-->
-<!--            <div class="con">-->
-<!--                {% csrf_token %}-->
-<!--                <h1 style="">Enter Bank Details</h1>-->
-<!--                <div class="A_input">-->
-<!--                    <label style="margin-left:10px;" for="acc_no">#AC-No </label>-->
-<!--                    <input style="margin-left:10px;" name="acc_no" type="text"  id="acc_no" placeholder="Account Number" required>-->
-<!--                </div>-->
-<!--                <div class="A_input">-->
-<!--                    <label style="margin-left:10px;" for="pay">Amount</label>-->
-<!--                    <input style="margin-left:10px;" name="pay" type="number"  id="pay" placeholder="Account Number" required>-->
-<!--                </div>-->
-<!--                <div class="A_input">-->
-<!--                    <label style="margin-left:10px;" for="purpose">Purpose</label>-->
-<!--                    <input style="margin-left:10px;" name="purpose" type="text"  id="purpose" placeholder="Account Number" required>-->
-<!--                </div>-->
+        <h1>Bank Information</h1>
+        <form  action="{% url 'money_transfer' %}" method="POST">
+            <div class="con">
+                {% csrf_token %}
+                <h1 style="">Enter Bank Details</h1>
+                <div class="A_input">
+                    <label style="margin-left:10px;" for="acc_no">#AC-No </label>
+                    <input style="margin-left:10px;" name="acc_no" type="text"  id="acc_no" placeholder="Account Number" required>
+                </div>
+                <div class="A_input">
+                    <label style="margin-left:10px;" for="pay">Amount</label>
+                    <input style="margin-left:10px;" name="pay" type="number"  id="pay" placeholder="Account Number" required>
+                </div>
+                <div class="A_input">
+                    <label style="margin-left:10px;" for="purpose">Purpose</label>
+                    <input style="margin-left:10px;" name="purpose" type="text"  id="purpose" placeholder="Account Number" required>
+                </div>
 
-<!--                <button class="button1" style="margin-left:5px;" type="submit" onclick="ABC()">Submit</button>-->
-<!--                <button class="button1" style="" onclick="closeForm4()" >Cancel</button>-->
-<!--            </div>-->
-<!--        </form>-->
+                <button class="button1" style="margin-left:5px;" type="submit" onclick="ABC()">Submit</button>
+                <button class="button1" style="" onclick="closeForm4()" >Cancel</button>
+            </div>
+        </form>
     </div>
 </div>
 

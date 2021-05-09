@@ -93,13 +93,12 @@
                             <thead>
                             <tr>
                                 <td class="text-center"><strong></strong></td>
-                                <td class="text-center"><strong>passenger Name</strong></td>
+                                <td class="text-center"><strong>Purpose</strong></td>
+                                <td class="text-center"><strong>Bank Name</strong></td>
+                                <td class="text-center"><strong>Account Name</strong></td>
+                                <td class="text-center"><strong>Account Number</strong></td>
+                                <td class="text-center"><strong>Bank Code</strong></td>
                                 <td class="text-center"><strong>Bill</strong></td>
-                                <td class="text-center"><strong></strong></td>
-                                <td class="text-center"><strong></strong></td>
-                                <td class="text-center"><strong></strong></td>
-                                <td class="text-center"><strong></strong></td>
-                                <td class="text-center"><strong></strong></td>
                             </tr>
 
 
@@ -108,13 +107,12 @@
                             <!-- foreach ($order->lineItems as $line) or some such thing here -->
                             <tr>
                                 <td class="text-center">{{forloop.counter}}</td>
-                                <td class="text-center">{{data.passenger}}</td>
+                                <td class="text-center">{{data.purpose}}</td>
+                                <td class="text-center">{{data.bank_name}}</td>
+                                <td class="text-center">{{data.account_name}}</td>
+                                <td class="text-center">{{data.account_number}}</td>
+                                <td class="text-center">{{data.bank_code}}</td>
                                 <td class="text-center">{{data.Bill}}</td>
-                                <td class="text-center"></td>
-                                <td class="text-center"></td>
-                                <td class="text-center"></td>
-                                <td class="text-center"></td>
-                                <td class="text-center"></td>
                             </tr>
 
                             <tr>

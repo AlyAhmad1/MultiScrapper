@@ -4,7 +4,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from . import login_required
 from django.http import HttpResponse
-from .models import WakanowScrape, BeforePaymentData
+from .models import WakanowScrape, BeforePaymentData, Payment
 from arikair.models import ArikData
 from flyairpeace.models import AirpeaceScraper
 from jumaia.models import JumaiaScraper
@@ -158,9 +158,6 @@ def data_scraper(request, driver):
         # data[10].click()
         # data[11].click()
     except Exception as E:
-        print('---')
-        print(E)
-        print('-------')
         raise E
     try:
         ff = all_data.find_element(By.TAG_NAME, 'app-mbb-flight-details').find_elements(By.TAG_NAME, 'p')
@@ -191,8 +188,7 @@ def data_scraper(request, driver):
 
         return d, data_show
     except Exception as E:
-        print(E)
-
+        raise E
 
 @login_required
 def home(request):
@@ -340,65 +336,47 @@ def set_new_password(request, id):
 
 
 def payment(request, Amount, ALLData, web):
+    BeforePaymentData.objects.filter(email=request.session['email']).delete()
+    BeforePaymentData(email=request.session['email'],
+                        web=web,
+                        ALL_data=ALLData,Amount=Amount).save()
+    return render(request, 'wakanow/Payment.html', {'Amount':Amount,'email': request.session['email']})
+
+
+def money_transfer(request):
     if request.method == 'POST':
         account = request.POST['acc_no']
         purpose = request.POST['purpose']
-        ACCOUNT = money_transfer(account, purpose)
-        if ACCOUNT:
-            ACCOUNT['Amount'] = Amount
-            ACCOUNT = json.dumps(ACCOUNT)
-            Data_Show = json.loads(ACCOUNT)
+        PAY = request.POST['pay']
+        data = requests.get(url=f'https://app.nuban.com.ng/api/NUBAN-TKLGONRH525?acc_no={account}')
+        d = data.json()
+        try:
+            if d['error']:
+                return HttpResponse(False)
+        except:
+            d = data.json()[0]
+            d['purpose'] = purpose
+            d['PAY'] = PAY
+            DDD = json.dumps(d)
             BeforePaymentData.objects.filter(email=request.session['email']).delete()
             BeforePaymentData(email=request.session['email'],
-                              web=web,
-                              ALL_data=ALLData,Account_data=ACCOUNT,Amount=Amount, Account=account).save()
-            return render(request, 'wakanow/Payment.html', {'ACCOUNT': Data_Show,'email': request.session['email']})
-        else:
-            messages.error(request,'Account not exist')
-            return redirect('home')
-
-
-def money_transfer(account,purpose):
-    data = requests.get(url=f'https://app.nuban.com.ng/api/NUBAN-TKLGONRH525?acc_no={account}')
-    d = data.json()
-    try:
-        if d['error']:
-            return False
-    except:
-        d = data.json()[0]
-        d['purpose'] = purpose
-        return d
+                              web='Direct_Payment',
+                              ALL_data=DDD, Amount=PAY).save()
+            return render(request, 'wakanow/pay_money.html', d)
 
 
 def success_pay(request):
     Data = BeforePaymentData.objects.filter(email=request.session['email'])[0]
-    d, status = transfer(Data.Account, Data.Amount)
-    while(True):
-        if status == 200:
-            if d['response_description'] == 'REQUEST ID ALREADY EXIST':
-                d, status = transfer(Data.Account, Data.Amount)
-                continue
-            break
-        else:
-            break
-    web = Data.web
     all_data = json.loads(Data.ALL_data)
-    account_data = json.loads(Data.Account_data)
+    web = Data.web
 
     if web == 'WAKANOW':
         wak = WakanowScrape(user_email=request.session['email'], passenger=all_data[0], passenger_email=all_data[1],
                             details=all_data[3], flight = all_data[7], Total_Bill=all_data[9], Amount_Paid=all_data[10],
-                            Bill=all_data[11],bank_name = account_data['bank_name'],
-                            account_name= account_data['account_name'],account_number = account_data['account_number'],
-                            bank_code = account_data['bank_code'],purpose = account_data['purpose'],)
+                            Bill=all_data[11],)
         WakanowScrape.save(wak)
     elif web == 'airpeace':
         Airpeace = AirpeaceScraper(user_email=request.session['email'], passenger=all_data[0],Bill=all_data[10],
-                                   bank_name=account_data['bank_name'],
-                                   account_name=account_data['account_name'],
-                                   account_number=account_data['account_number'],
-                                   bank_code=account_data['bank_code'],
-                                   purpose=account_data['purpose']
                                    )
         AirpeaceScraper.save(Airpeace)
 
@@ -409,24 +387,37 @@ def success_pay(request):
                         Date=all_data[4], Time=all_data[5], Total_bagage=all_data[6],
                         Tiket_fare=all_data[7], Tax=all_data[8], Surcharge=all_data[9],
                         service=all_data[10], insurance_fee=all_data[11], Bill=all_data[12],
-                        bank_name=account_data['bank_name'],
-                        account_name=account_data['account_name'],
-                        account_number=account_data['account_number'],
-                        bank_code=account_data['bank_code'],
-                        purpose=account_data['purpose']
                         )
         ArikData.save(Arik)
 
     elif web == 'jumaia':
         new_data = json.dumps(all_data)
         jum = JumaiaScraper(user_email=request.session['email'], All_Data=new_data, Bill=str(Data.Amount),
-                            bank_name=account_data['bank_name'],
-                            account_name=account_data['account_name'],
-                            account_number=account_data['account_number'],
-                            bank_code=account_data['bank_code'],
-                            purpose=account_data['purpose']
                             )
         JumaiaScraper.save(jum)
+
+    else:
+        new_data = all_data
+        d, status = transfer('', Data.Amount)
+        while (True):
+            if status == 200:
+                if d['response_description'] == 'REQUEST ID ALREADY EXIST':
+                    d, status = transfer(Data.Account, Data.Amount)
+                    continue
+                break
+            else:
+                break
+
+        P = Payment(user_email=request.session['email'], Bill=str(Data.Amount),
+                            bank_name=new_data['bank_name'],
+                            account_name=new_data['account_name'],
+                            account_number=new_data['account_number'],
+                            bank_code=new_data['bank_code'],
+                            purpose=new_data['purpose']
+                            )
+        Payment.save(P)
+
+
     messages.error(request, 'Successfully transfer')
     BeforePaymentData.objects.filter(email=request.session['email']).delete()
     return redirect('home')

@@ -27,26 +27,7 @@
 
 
 <div class="con">
-    <h1>Total Amount {{ACCOUNT.Amount}} <span>&#8358;</span></h1>
-</div>
-<div>
-    <div id="B">
-<form>
-    <h5>Bank Name:{{ACCOUNT.bank_name}}</h5>
-<hr/>
-
-    <h5>Name: {{ACCOUNT.account_name}}</h5>
-<hr/>
-
-    <h5>Account No:{{ACCOUNT.account_number}}</h5>
-<hr/>
-
-    <h5>Bank Code: {{ACCOUNT.bank_code}}</h5>
-<hr/>
-    <h5>Amount : {{ACCOUNT.Amount}} <span>&#8358;</span></h5>
-<hr/>
-    <h5>Purpose: {{ACCOUNT.purpose}}</h5><hr/>
-</form>
+    <h1>Total Amount {{Amount}} <span>&#8358;</span></h1>
 </div>
 
 
@@ -54,7 +35,7 @@
 <div style="display:inline-block;">
     <form id="form" method="POST"  action="https://payviacoins.com/api/v1/invoices" class="btcpay-form btcpay-form--block">
         <input type="hidden" name="storeId" value="Hgd1DVa49BB29CUFFnLoCw33PkYKJPHj2xxjwraf88qM" />
-        <input type="hidden" name="price" value="{{ACCOUNT.Amount}}"/>
+        <input type="hidden" name="price" value="{{Amount}}"/>
         <input type="hidden" name="currency" value="NGN" />
         <input type="hidden" name="browserRedirect" value="{% url 'test_transfer' %}" />
         <input type="hidden" name="notifyEmail" value="{{email}}" />

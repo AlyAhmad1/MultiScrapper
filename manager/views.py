@@ -26,6 +26,8 @@ def details(request, web):
 
     elif web == 'jumaia':
         data = JumaiaScraper.objects.all().order_by('id')
+    else:
+        data = Payment.objects.all().order_by('id')
 
     return render(request, 'manager/All_details.html', {'data': data, 'web': web})
 
@@ -45,7 +47,7 @@ def details_invoice(request, id, web):
         data_detail = json.loads(data.All_Data)
         return render(request, 'jumaia/jumaiainvoice.html', {'data':data,'data_detail':data_detail})
     else:
-        data = PaymentTransfer.objects.get(id=id)
+        data = Payment.objects.get(id=id)
         return render(request, 'manager/payment_invoice.html', {'data': data})
 
 
