@@ -2,7 +2,7 @@ from django.shortcuts import render
 from selenium import webdriver
 import time, json
 from django.contrib import messages
-
+from webdriver_manager.chrome import ChromeDriverManager
 Details = []
 
 
@@ -27,18 +27,7 @@ def scraper_form(request, Name, Reference):
     Details.clear()
     options = webdriver.ChromeOptions()
     options.add_argument("headless")
-    options.add_argument("window-size=1500,1200")
-    options.add_argument("no-sandbox")
-    options.add_argument("disable-dev-shm-usage")
-    options.add_argument("disable-gpu")
-    options.add_argument("log-level=3")
-    options.add_argument("--disable-xss-auditor")
-    options.add_argument("--disable-web-security")
-    options.add_argument("--allow-running-insecure-content")
-    options.add_argument("--disable-setuid-sandbox")
-    options.add_argument("--disable-webgl")
-    options.add_argument("--disable-popup-blocking")
-    driver = webdriver.Chrome(chrome_options=options)
+    driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=options)
     # driver = webdriver.Chrome()
     try:
         driver.get("https://arikair.com/")
@@ -63,12 +52,12 @@ def scraper_form(request, Name, Reference):
         form_input[1].send_keys(Name)
         form_input[2].click()
     except:
-        messages.error(request, 'Wrong Login Info \n Try  Again!!')
+        messages.success(request, 'Wrong Login Info \n Try  Again!!')
         Name = ['Wrong Login Information Try Again!!', 0]
         return Name
     Name, data_Show = data_scraper(request, driver)
     if not Name:
-        messages.error(request, 'error in Page loading check your internet connection')
+        messages.success(request, 'error in Page loading check your internet connection')
         Name = ['No Data Found', 0]
         data_show = []
         return Name, data_show

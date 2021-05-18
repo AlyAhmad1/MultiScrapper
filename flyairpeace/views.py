@@ -72,7 +72,7 @@ def scraper_form(request, Name, Reference):
         B[5].send_keys(Reference)
         B[7].click()
     except:
-        messages.error(request, 'Wrong Login Info')
+        messages.success(request, 'Wrong Login Info')
         Name = ['Wrong Login Info  Try  Again!!', 0]
         return Name
     try:
@@ -80,7 +80,7 @@ def scraper_form(request, Name, Reference):
 
         return Name,data_show
     except:
-        messages.error(request,'No Data Found')
+        messages.success(request,'No Data Found')
         Name = ['No Data Found', 0]
         data_show = []
         return Name,data_show

@@ -3,6 +3,7 @@ from django.contrib import messages
 import _pickle as pickle
 import json
 
+
 Total = 0
 D = []
 Check = []
@@ -18,7 +19,7 @@ def form_data(request):
         Total += Amount
         A = [website, link, Amount]
         Check.append(A)
-        messages.error(request, 'Item Added Click Submit button to check details')
+        messages.success(request, 'Item Added Click Submit button to check details')
         return redirect('home')
 
 
@@ -36,14 +37,13 @@ def All_data(request):
 
 def data_update(request, index, whole, T):
     global Total, Check, D
-    whole = str(whole).strip("'<>() ").replace('\'', '\"')
+    # whole = unquote(whole)               #for production
     whole = json.loads(whole)
-    index = (int(index)-1)
-    A = whole[index]
-    T = int(T) - int(A[2])
+    index = int(int(index)-1)
+    A = whole[index][-1]
+    T = int(T) - int(A)
     del whole[index]
     Total,Check,D = 0, [],[]
     Check = whole
     Total = T
-
     return redirect('jumaia_scraper1')

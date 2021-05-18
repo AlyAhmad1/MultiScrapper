@@ -87,7 +87,7 @@ def scraper_form(request, email, name, reference):
                         time.sleep(5)
                         link = driver.find_elements(By.TAG_NAME, 'div')[21]
                     except:
-                        messages.error(request, 'ERRORR')
+                        messages.success(request, 'ERRORR')
                         ame = ['Wrong Login Info  Try  Again!!', 0]
                         return ame
         try:
@@ -110,7 +110,7 @@ def scraper_form(request, email, name, reference):
         f.find_element(By.TAG_NAME, 'button').click()
 
     except:
-        messages.error(request, 'Wrong Login Information Try  Again!!')
+        messages.success(request, 'Wrong Login Information Try  Again!!')
         ame = ['Wrong Login Info  Try  Again!!', 0]
         return ame
 
@@ -118,7 +118,7 @@ def scraper_form(request, email, name, reference):
         ame,data_show = data_scraper(request, driver)
         return ame,data_show
     except:
-        messages.error(request, 'No Data Found')
+        messages.success(request, 'No Data Found')
         ame = ['No Data Found', 0]
         data_show = []
         return ame, data_show
@@ -155,8 +155,6 @@ def data_scraper(request, driver):
     try:
         data[8].click()
         data[9].click()
-        # data[10].click()
-        # data[11].click()
     except Exception as E:
         raise E
     try:
@@ -208,7 +206,7 @@ def sign_in(request):
             request.session['email'] = email
             return redirect('home')
         else:
-            messages.error(request, 'Invalid Email or Password')
+            messages.success(request, 'Invalid Email or Password')
             return render(request, 'wakanow/login.html')
     return render(request, 'wakanow/login.html')
 
@@ -226,17 +224,17 @@ def register_user(request):
                                 headers = {'Authorization': "Bearer " + api_key })
         status = response.json()['status']
         if status == "invalid":
-            messages.error(request, 'Invalid Email')
+            messages.success(request, 'Invalid Email')
             return render(request, 'wakanow/Signup.html')
         all_users = RegisteredUsers.objects.filter(Email=email)
         if all_users:
-            messages.error(request, 'Email Already Exists')
+            messages.success(request, 'Email Already Exists')
             return render(request, 'wakanow/Signup.html')
         data = RegisteredUsers(Email=email, Password=password, FName=fname, LName=lname)
         RegisteredUsers.save(data)
         request.session['email'] = email
         request.session['user'] = fname
-        messages.error(request, 'Successfully Register')
+        messages.success(request, 'Successfully Register')
         return redirect('home')
     return render(request, 'wakanow/Signup.html')
 
@@ -273,7 +271,7 @@ def reset_password_email(request):
                 send_mail(subject, message, EMAIL_HOST_USER, [receiver], fail_silently=False)
                 return redirect('reset_pass', email=email)
         else:
-            messages.error(request, "Email Not registered")
+            messages.success(request, "Email Not registered")
             return render(request, 'wakanow/reset_password_enter_email.html')
     return render(request, 'wakanow/reset_password_enter_email.html')
 
@@ -308,10 +306,10 @@ def reset_password(request, email):
                     return redirect('set_new_pass', id=id)
                 else:
                     verify.delete()
-                    messages.error(request,'Token Expire')
+                    messages.success(request,'Token Expire')
                     return render(request, 'wakanow/reset_pass_code.html')
             else:
-                messages.error(request,'Invalid Token')
+                messages.success(request,'Invalid Token')
                 return render(request, 'wakanow/reset_pass_code.html')
     return render(request, 'wakanow/reset_pass_code.html')
 
@@ -327,7 +325,7 @@ def set_new_password(request, id):
                     EE.save()
                     request.session['email'] = EE.Email
                     request.session['user'] = str(EE.Email).split('@')[0]
-                    messages.error(request, 'Password Changed')
+                    messages.success(request, 'Password Changed')
                     return redirect('home')
 
             return render(request, 'wakanow/set_password.html')
@@ -418,7 +416,7 @@ def success_pay(request):
         Payment.save(P)
 
 
-    messages.error(request, 'Successfully transfer')
+    messages.success(request, 'Successfully transfer')
     BeforePaymentData.objects.filter(email=request.session['email']).delete()
     return redirect('home')
 
