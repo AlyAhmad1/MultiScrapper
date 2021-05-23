@@ -10,6 +10,6 @@ def login_required(f):
             if request.session['user']:
                 return f(request)
         except:
-            messages.error(request, 'You Need To Login First')
+            messages.success(request, 'You Need To Login First')
             return redirect('login')
     return wrap

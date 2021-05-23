@@ -1,3 +1,5 @@
+from django.contrib.auth import login, authenticate, get_user_model
+from django.contrib.auth import logout as log_out
 from django.shortcuts import render, redirect
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -11,7 +13,7 @@ from jumaia.models import JumaiaScraper
 from selenium import webdriver
 import time
 from django.contrib import messages
-from arikair.models import RegisteredUsers, MailOTP
+from arikair.models import MailOTP
 from MultiS.settings import EMAIL_HOST_USER
 from django.core.mail import send_mail
 import random
@@ -21,6 +23,7 @@ from django.utils import timezone
 import json
 import requests
 
+RegisteredUsers = get_user_model()
 Details = []
 
 # these variables will be used to save information of scraper and account
@@ -49,20 +52,10 @@ def scraper_form(request, email, name, reference):
     Details.clear()
     options = webdriver.ChromeOptions()
     options.add_argument("headless")
-    options.add_argument("window-size=1500,1200")
-    options.add_argument("no-sandbox")
-    options.add_argument("disable-dev-shm-usage")
     options.add_argument("disable-gpu")
     options.add_argument("log-level=3")
-    options.add_argument("--disable-xss-auditor")
-    options.add_argument("--disable-web-security")
-    options.add_argument("--allow-running-insecure-content")
-    options.add_argument("--disable-setuid-sandbox")
-    options.add_argument("--disable-webgl")
-    options.add_argument("--disable-popup-blocking")
     options.add_experimental_option("excludeSwitches", ["enable-logging"])
     driver = webdriver.Chrome(chrome_options=options)
-    # driver = webdriver.Chrome()
     try:
         driver.get("https://www.wakanow.com/en-ng/manage-booking")
         try:
@@ -200,12 +193,21 @@ def sign_in(request):
     if request.method == 'POST':
         email = request.POST['Email']
         password = request.POST['Password']
-        all_users = RegisteredUsers.objects.filter(Email=email,Password=password)
-        if all_users:
-            request.session['user'] = all_users[0].FName
-            request.session['email'] = email
-            return redirect('home')
-        else:
+        all_users = RegisteredUsers.objects.filter(Email=email)
+        try:
+            if all_users:
+                request.session['user'] = all_users[0].FName
+                request.session['email'] = email
+                user = authenticate(Email=email, password=password)
+                if user is not None:
+                    login(request, user)
+                    messages.success(request, "welcome:{}".format(request.user.FName))
+                    return redirect('home')
+                messages.success(request, "Incorrect Password")
+            else:
+                messages.success(request, 'Invalid Email or Password')
+                return render(request, 'wakanow/login.html')
+        except:
             messages.success(request, 'Invalid Email or Password')
             return render(request, 'wakanow/login.html')
     return render(request, 'wakanow/login.html')
@@ -227,21 +229,30 @@ def register_user(request):
             messages.success(request, 'Invalid Email')
             return render(request, 'wakanow/Signup.html')
         all_users = RegisteredUsers.objects.filter(Email=email)
-        if all_users:
-            messages.success(request, 'Email Already Exists')
-            return render(request, 'wakanow/Signup.html')
-        data = RegisteredUsers(Email=email, Password=password, FName=fname, LName=lname)
+        try:
+            if all_users:
+                messages.success(request, 'Email Already Exists')
+                return render(request, 'wakanow/Signup.html')
+        except:
+            pass
+        data = RegisteredUsers(Email=email, FName=fname, LName=lname)
+        data.set_password(password)
         RegisteredUsers.save(data)
         request.session['email'] = email
         request.session['user'] = fname
-        messages.success(request, 'Successfully Register')
-        return redirect('home')
+        user = authenticate(Email=email, password=password)
+        print(user)
+        if user is not None:
+            login(request, user)
+            messages.success(request, 'Successfully Register')
+            return redirect('home')
     return render(request, 'wakanow/Signup.html')
 
 
 def logout(request):
     del request.session['user']
     del request.session['email']
+    log_out(request)
     return redirect('login')
 
 

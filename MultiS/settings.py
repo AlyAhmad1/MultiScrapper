@@ -142,3 +142,4 @@ EMAIL_HOST_PASSWORD = '111econet'
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+AUTH_USER_MODEL = 'arikair.RegUser'
