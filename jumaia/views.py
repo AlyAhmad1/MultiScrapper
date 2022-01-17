@@ -1,49 +1,31 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-import _pickle as pickle
 import json
+from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
 
 
-Total = 0
-D = []
-Check = []
+# def data_update(request, index, whole, T):
+#     # whole = unquote(whole)               #for production
+#     whole = json.loads(whole)
+#     index = int(int(index)-1)
+#     A = whole[index][-1]
+#     T = int(T) - int(A)
+#     del whole[index]
+#     Total, Check, D = 0, [], []
+#     Check = whole
+#     Total = T
+#     return redirect('jumaia_scraper1')
 
 
-def form_data(request):
-    global Total, D, Check
-    D.clear()
+@never_cache
+@csrf_exempt
+def submit_data(request):
     if request.method == 'POST':
-        website = request.POST.get('website')
-        link = request.POST.get('Name')
-        Amount = int(request.POST.get('RF'))
-        Total += Amount
-        A = [website, link, Amount]
-        Check.append(A)
-        messages.success(request, 'Item Added Click Submit button to check details')
-        return redirect('home')
-
-
-def All_data(request):
-    global Total, D, Check
-    for i in Check:
-        D.append(i)
-    Items = json.dumps(D)
-    web = 'jumaia'
-    Data = {'D': D, 'Total': Total, 'Items': Items, 'web': web}
-    Check.clear()
-    Total = 0
-    return render(request, 'jumaia/details.html', Data)
-
-
-def data_update(request, index, whole, T):
-    global Total, Check, D
-    # whole = unquote(whole)               #for production
-    whole = json.loads(whole)
-    index = int(int(index)-1)
-    A = whole[index][-1]
-    T = int(T) - int(A)
-    del whole[index]
-    Total,Check,D = 0, [],[]
-    Check = whole
-    Total = T
-    return redirect('jumaia_scraper1')
+        print("---")
+        request.session['list_data'] = request.POST.get('all_Data')
+        print(request.session['list_data'])
+        context = {'data_de': request.session['list_data'], 'Items': "Items", 'web': "web"}
+        return render(request, 'jumaia/details.html', context)
+    pass

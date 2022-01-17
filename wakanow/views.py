@@ -18,7 +18,6 @@ from MultiS.settings import EMAIL_HOST_USER
 from django.core.mail import send_mail
 import random
 import datetime
-from urllib.parse import unquote
 from django.utils import timezone
 import json
 import requests
@@ -59,11 +58,9 @@ def scraper_form(request, email, name, reference):
     try:
         driver.get("https://www.wakanow.com/en-ng/manage-booking")
         try:
-            data = WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.TAG_NAME, "main")))
+            WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "main")))
         except:
-            data = WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.TAG_NAME, "main")))
+            WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "main")))
 
         try:
             link = driver.find_elements(By.TAG_NAME, 'div')[21]
@@ -88,15 +85,12 @@ def scraper_form(request, email, name, reference):
         except:
             time.sleep(5)
             link.click()
-
         try:
             f = driver.find_element(By.TAG_NAME, 'form')
         except:
             time.sleep(5)
             f = driver.find_element(By.TAG_NAME, 'form')
-
         input_list = f.find_elements(By.TAG_NAME, 'input')
-
         input_list[0].send_keys(reference)
         input_list[1].send_keys(name)
         input_list[2].send_keys(email)
@@ -108,8 +102,8 @@ def scraper_form(request, email, name, reference):
         return ame
 
     try:
-        ame,data_show = data_scraper(request, driver)
-        return ame,data_show
+        ame, data_show = data_scraper(request, driver)
+        return ame, data_show
     except:
         messages.success(request, 'No Data Found')
         ame = ['No Data Found', 0]
@@ -181,6 +175,7 @@ def data_scraper(request, driver):
     except Exception as E:
         raise E
 
+
 @login_required
 def home(request):
     if request.session['user'] == 'Admin12345678910!':
@@ -193,17 +188,14 @@ def sign_in(request):
     if request.method == 'POST':
         email = request.POST['Email']
         password = request.POST['Password']
-        all_users = RegisteredUsers.objects.filter(Email=email)
         try:
-            if all_users:
-                request.session['user'] = all_users[0].FName
+            user = authenticate(Email=email, password=password)
+            if user is not None:
+                login(request, user)
+                messages.success(request, "welcome:{}".format(request.user.FName))
+                request.session['user'] = request.user.FName
                 request.session['email'] = email
-                user = authenticate(Email=email, password=password)
-                if user is not None:
-                    login(request, user)
-                    messages.success(request, "welcome:{}".format(request.user.FName))
-                    return redirect('home')
-                messages.success(request, "Incorrect Password")
+                return redirect('home')
             else:
                 messages.success(request, 'Invalid Email or Password')
                 return render(request, 'wakanow/login.html')
@@ -217,13 +209,13 @@ def register_user(request):
     if request.method == 'POST':
         email = request.POST['Email']
         password = request.POST['Password']
-        fname = request.POST['fname']
-        lname = request.POST['lname']
+        f_name = request.POST['fname']
+        l_name = request.POST['lname']
 
         # email Checking
         api_key = "996ad77f-aeb0-478b-936c-5c0ee5838da5"
         response = requests.get("https://isitarealemail.com/api/email/validate", params={'email': email},
-                                headers = {'Authorization': "Bearer " + api_key })
+                                headers={'Authorization': "Bearer " + api_key})
         status = response.json()['status']
         if status == "invalid":
             messages.success(request, 'Invalid Email')
@@ -235,13 +227,12 @@ def register_user(request):
                 return render(request, 'wakanow/Signup.html')
         except:
             pass
-        data = RegisteredUsers(Email=email, FName=fname, LName=lname)
+        data = RegisteredUsers(Email=email, FName=f_name, LName=l_name)
         data.set_password(password)
         RegisteredUsers.save(data)
         request.session['email'] = email
-        request.session['user'] = fname
+        request.session['user'] = f_name
         user = authenticate(Email=email, password=password)
-        print(user)
         if user is not None:
             login(request, user)
             messages.success(request, 'Successfully Register')
@@ -277,8 +268,8 @@ def reset_password_email(request):
                     OTP=key,
                     timestamp=expiry)
                 MailOTP.save(add_otp)
-                cofirmed_email = RegisteredUsers.objects.get(Email=email)
-                email = cofirmed_email.id
+                confirmed_email = RegisteredUsers.objects.get(Email=email)
+                email = confirmed_email.id
                 send_mail(subject, message, EMAIL_HOST_USER, [receiver], fail_silently=False)
                 return redirect('reset_pass', email=email)
         else:
@@ -300,9 +291,9 @@ def genotp(email):
 
 
 def reset_password(request, email):
-    EE = RegisteredUsers.objects.get(id=email)
-    id = email
-    email = EE.Email
+    user = RegisteredUsers.objects.get(id=email)
+    user_id = email
+    email = user.Email
     if request.method == 'POST':
         otp = request.POST['otp']
         if otp:
@@ -312,9 +303,9 @@ def reset_password(request, email):
                 if timezone.now() < verify.timestamp:
                     verify.delete()
                     request.session['email'] = email
-                    request.session['user'] = str(EE.Email).split('@')[0]
+                    request.session['user'] = str(user.Email).split('@')[0]
 
-                    return redirect('set_new_pass', id=id)
+                    return redirect('set_new_pass', id=user_id)
                 else:
                     verify.delete()
                     messages.success(request,'Token Expire')

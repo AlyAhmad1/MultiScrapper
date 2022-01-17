@@ -1,4 +1,31 @@
-.idea
-venv
-db.sqlite3
+# Don't track content of these folders
+.idea/
+__pycache__/
+author_documents/
+venv/
+migrations/
+
+# Compiled source #
+###################
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
 *.pyc
+*.sqlite3
+
+# Packages #
+############
+# it's better to unpack these files and commit the raw source
+# git has its own built in compression methods
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+

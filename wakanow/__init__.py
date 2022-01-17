@@ -9,7 +9,8 @@ def login_required(f):
         try:
             if request.session['user']:
                 return f(request)
-        except:
+        except Exception as e:
+            print(e)
             messages.success(request, 'You Need To Login First')
             return redirect('login')
     return wrap

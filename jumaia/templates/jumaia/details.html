@@ -48,14 +48,16 @@
         </tr>
         </thead>
         <tbody>
-        {% for i in D %}
+        {% for i in data_de %}
         <tr>
             <th scope="row">{{forloop.counter}}</th>
             <td>{{i.0}}</td>
             <td>{{i.1}}</td>
             <td>{{i.2}}</td>
-            <td style="text-align:center;"><a href="{% url 'jumaia_scraper1_del' index=forloop.counter whole=Items T=Total %}">
-                <i class="fa fa-trash"></i></a></td>
+            <td style="text-align:center;">
+                <i class="fa fa-trash"></i>
+
+            </td>
         </tr>
         {% endfor %}
         Total Price  {{Total}}
