@@ -155,7 +155,7 @@ text-align: center;
                 <div class="con">
                     {% csrf_token %}
                     <label>Select Website *</label>
-                    <select name="website" id="cars" style="width: -webkit-fill-available;height: 30px;" onkeyup="check_o1()">
+                    <select name="website" id="cars" style="width: -webkit-fill-available;height: 30px;" onchange="check_o1()" required>
                         <option value="">Select Website</option>
                         <option value="Alibaba.com">Alibaba.com</option>
                         <option value="AliExpress.com">AliExpress.com</option>
@@ -189,7 +189,7 @@ text-align: center;
                     <tr></tr>
                     </tbody>
                 </table>
-                 <button onclick="submit_data()" class="button1" style="display: inline-flex;justify-content: center;float: unset;">Submit</button>
+                 <button onclick="submit_data()" class="button1" style="">Submit</button>
             </div>
         </div>
 
@@ -334,6 +334,8 @@ var items = [];
   items.push(exampleInputPassword4);
   $('#main_table tr:last').after("<tr><td>"+`${cars}`+"</td><td>"+`${exampleCheck4}`+"</td><td>"+`${exampleInputPassword4}`+"</td></tr>");
   all_Data.push(items);
+  document.getElementById("o1").disabled = true;
+  document.getElementById("o1").classList.add("disabled");
 }
 
 function check_o1(){

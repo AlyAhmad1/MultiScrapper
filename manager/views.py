@@ -10,7 +10,7 @@ from jumaia.models import *
 
 
 # Create your views here.
-def Home(request):
+def home(request):
     return render(request, 'manager/manager_index.html')
 
 
