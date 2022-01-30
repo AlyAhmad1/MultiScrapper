@@ -22,10 +22,10 @@ def form_data(request):
 def scraper_form(request, name, reference):
     options = webdriver.ChromeOptions()
 
-    # options.add_argument("--disable-notifications")
-    # options.add_argument("headless")
-    # options.add_argument("disable-gpu")
-    # options.add_argument("log-level=3")
+    options.add_argument("--disable-notifications")
+    options.add_argument("headless")
+    options.add_argument("disable-gpu")
+    options.add_argument("log-level=3")
     driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=options)
     try:
         driver.get("https://www.flyairpeace.com/managebooking.php")
